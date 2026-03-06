@@ -1,36 +1,108 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DevTrack – Developer Project & Experience Manager
+
+A web-based tool that helps developers track projects, accounts, tech stacks, and export professional experience for resumes and portfolios.
+
+## Features
+
+- Project management with detailed tracking
+- Gmail and GitHub account management
+- Tech stack library
+- Experience export to CSV
+- Professional project descriptions
+- Role and responsibility tracking
+
+## Tech Stack
+
+- **Frontend**: Next.js (App Router), React, TailwindCSS
+- **Backend**: Next.js API Routes
+- **Database**: Supabase PostgreSQL
+- **Authentication**: Supabase Auth
+- **Hosting**: Vercel
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+ installed
+- Supabase account
+- npm or yarn
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Set up environment variables:
+
+Create a `.env.local` file:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
+
+4. Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+/app
+  /dashboard       - Dashboard with statistics
+  /projects        - Project management
+  /gmail-accounts  - Gmail account tracking
+  /github-accounts - GitHub account tracking
+  /tech-stacks     - Tech stack library
+  /export          - Experience export
+/components        - Reusable UI components
+/lib               - Utilities and services
+/types             - TypeScript definitions
+```
 
-## Learn More
+## Documentation
 
-To learn more about Next.js, take a look at the following resources:
+- [Product Requirements (PRD)](./doc/prd.md)
+- [Database Requirements (DRD)](./doc/drd.md)
+- [Technical Requirements (TRD)](./doc/trd.md)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Key Features
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Dashboard
+View statistics and recent projects at a glance.
+
+### Project Management
+Track project details including:
+- Name, type, and category
+- Role and responsibilities
+- Tech stack used
+- Repository and hosting info
+- Start and end dates
+
+### Account Management
+Manage Gmail and GitHub accounts used across projects.
+
+### Tech Stack Library
+Maintain a library of technologies used in your projects.
+
+### Experience Export
+Export selected projects to CSV format for resumes and job applications.
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The easiest way to deploy is using the [Vercel Platform](https://vercel.com/new).
+
+## License
+
+MIT
