@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, FolderKanban, Mail, Github, Layers, Download, LogOut } from 'lucide-react';
+import { useAuth } from '@/lib/supabase/AuthProvider';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -16,6 +17,7 @@ const navigation = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { signOut } = useAuth();
 
   return (
     <div className="w-64 bg-slate-900 text-white min-h-screen flex flex-col">
@@ -52,7 +54,10 @@ export default function Sidebar() {
       </nav>
 
       <div className="p-4 border-t border-slate-800">
-        <button className="w-full flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-all">
+        <button 
+          onClick={signOut}
+          className="w-full flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-all"
+        >
           <LogOut className="w-5 h-5" />
           <span className="font-medium">Logout</span>
         </button>

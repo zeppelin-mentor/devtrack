@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, ArrowRight, Eye, EyeOff, Sparkles, CheckCircle2 } from 'lucide-react';
+import { signUp } from '@/lib/supabase/auth';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -32,13 +33,22 @@ export default function SignupPage() {
 
     setLoading(true);
 
-    // TODO: Implement Supabase authentication
-    console.log('Signup:', { email, password });
-    
-    // Placeholder - redirect to dashboard
-    setTimeout(() => {
-      router.push('/dashboard');
-    }, 1000);
+    try {
+      const { data, error } = await signUp(email, password);
+      
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+        return;
+      }
+
+      if (data.user) {
+        router.push('/dashboard');
+      }
+    } catch (err) {
+      setError('An unexpected error occurred');
+      setLoading(false);
+    }
   };
 
   const benefits = [

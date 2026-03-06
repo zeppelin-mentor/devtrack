@@ -38,15 +38,29 @@ npm install
 
 3. Set up environment variables:
 
-Create a `.env.local` file:
+Create a `.env.local` file with your Supabase credentials:
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 ```
 
-4. Run the development server:
+You can find these values in your Supabase project settings under API.
+
+4. Database Setup:
+
+The database schema is automatically created using Supabase migrations. The following tables are created:
+- `projects` - Project information
+- `gmail_accounts` - Gmail account tracking
+- `github_accounts` - GitHub account tracking
+- `tech_stacks` - Technology stack library
+- `categories` - Project categories
+- `roles` - Developer roles
+- `project_tech_stack` - Many-to-many relationship between projects and tech stacks
+
+Row Level Security (RLS) policies are enabled to ensure users can only access their own data.
+
+5. Run the development server:
 
 ```bash
 npm run dev
