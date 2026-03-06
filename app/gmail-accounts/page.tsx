@@ -8,6 +8,8 @@ import { getGmailAccounts, createGmailAccount, updateGmailAccount, deleteGmailAc
 import { Plus, Edit, Trash2, X } from 'lucide-react';
 import type { GmailAccount } from '@/types';
 
+import Loader from '@/components/Loader';
+
 export default function GmailAccountsPage() {
   const { user } = useAuth();
   const [showModal, setShowModal] = useState(false);
@@ -92,11 +94,8 @@ export default function GmailAccountsPage() {
       <ProtectedRoute>
         <div className="flex min-h-screen bg-slate-50">
           <Sidebar />
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-slate-600 font-medium">Loading...</p>
-            </div>
+          <div className="flex-1">
+            <Loader />
           </div>
         </div>
       </ProtectedRoute>

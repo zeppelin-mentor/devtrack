@@ -9,6 +9,8 @@ import { getProjects, getCategories, getRoles, getProjectTechStacks, getTechStac
 import { Plus, Search, Eye, Edit, Trash2, ExternalLink } from 'lucide-react';
 import type { Project, Category, Role, TechStack } from '@/types';
 
+import Loader from '@/components/Loader';
+
 export default function ProjectsPage() {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
@@ -96,11 +98,8 @@ export default function ProjectsPage() {
       <ProtectedRoute>
         <div className="flex min-h-screen bg-slate-50">
           <Sidebar />
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-slate-600 font-medium">Loading projects...</p>
-            </div>
+          <div className="flex-1">
+            <Loader />
           </div>
         </div>
       </ProtectedRoute>

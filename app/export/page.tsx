@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/supabase/AuthProvider';
 import { getProjects, getCategories, getRoles, getProjectTechStacks, getTechStacks } from '@/lib/supabase/database';
 import type { Project, Category, Role, TechStack } from '@/types';
 import { Download } from 'lucide-react';
+import Loader from '@/components/Loader';
 
 export default function ExportPage() {
   const { user } = useAuth();
@@ -151,10 +152,8 @@ export default function ExportPage() {
     return (
       <div className="flex">
         <Sidebar />
-        <div className="flex-1 bg-gray-50 p-8">
-          <div className="max-w-7xl mx-auto text-center">
-            <p className="text-gray-600">Loading...</p>
-          </div>
+        <div className="flex-1 bg-gray-50">
+          <Loader />
         </div>
       </div>
     );

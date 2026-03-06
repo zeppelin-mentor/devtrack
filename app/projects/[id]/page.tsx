@@ -6,7 +6,8 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/supabase/AuthProvider';
 import { getProject, getProjectTechStacks, getTechStacks, getCategories, getRoles, getGmailAccounts, getGitHubAccounts } from '@/lib/supabase/database';
 import type { Project, TechStack, Category, Role, GmailAccount, GitHubAccount } from '@/types';
-import { ArrowLeft, Edit } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import Loader from '@/components/Loader';
 
 export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -71,10 +72,8 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
     return (
       <div className="flex">
         <Sidebar />
-        <div className="flex-1 bg-gray-50 p-8">
-          <div className="max-w-4xl mx-auto text-center">
-            <p className="text-gray-600">Loading...</p>
-          </div>
+        <div className="flex-1 bg-gray-50">
+          <Loader />
         </div>
       </div>
     );
