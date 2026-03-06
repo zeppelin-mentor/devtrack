@@ -1,0 +1,11 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /projects
+Disallow: /gmail-accounts
+Disallow: /github-accounts
+Disallow: /tech-stacks
+Disallow: /export
+
+Sitemap: https://trackmydevelopement.vercel.app/sitemap.xml

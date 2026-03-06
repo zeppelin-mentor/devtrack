@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
 
@@ -37,6 +38,13 @@ export default function SignupPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
+          <Image
+            src="/horizantal-logo-devtrack.png"
+            alt="DevTrack"
+            width={200}
+            height={50}
+            className="h-12 w-auto mx-auto mb-6"
+          />
           <h1 className="text-4xl font-bold text-slate-900 mb-2">Create Account</h1>
           <p className="text-slate-600">Start tracking your projects today</p>
         </div>
