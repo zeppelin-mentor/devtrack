@@ -1,17 +1,60 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
-import { mockStore } from '@/lib/mockStore';
+import { useAuth } from '@/lib/supabase/AuthProvider';
+import { getProjects, getCategories, getRoles, getProjectTechStacks, getTechStacks } from '@/lib/supabase/database';
+import type { Project, Category, Role, TechStack } from '@/types';
+import { Download } from 'lucide-react';
 
 export default function ExportPage() {
+  const { user } = useAuth();
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
   const [categoryFilter, setCategoryFilter] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
+  const [allProjects, setAllProjects] = useState<Project[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [techStacks, setTechStacks] = useState<TechStack[]>([]);
+  const [projectTechStacks, setProjectTechStacks] = useState<Record<string, string[]>>({});
+  const [loading, setLoading] = useState(true);
 
-  const allProjects = mockStore.getProjects();
-  const categories = mockStore.getCategories();
-  const roles = mockStore.getRoles();
+  useEffect(() => {
+    if (user) {
+      loadData();
+    }
+  }, [user]);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const [projectsData, categoriesData, rolesData, techStacksData] = await Promise.all([
+        getProjects(user!.id),
+        getCategories(),
+        getRoles(),
+        getTechStacks(),
+      ]);
+      
+      setAllProjects(projectsData);
+      setCategories(categoriesData);
+      setRoles(rolesData);
+      setTechStacks(techStacksData);
+
+      // Load tech stacks for all projects
+      const techStackMap: Record<string, string[]> = {};
+      await Promise.all(
+        projectsData.map(async (project) => {
+          const stackIds = await getProjectTechStacks(project.id);
+          techStackMap[project.id] = stackIds;
+        })
+      );
+      setProjectTechStacks(techStackMap);
+    } catch (error) {
+      console.error('Error loading data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Filter projects
   const filteredProjects = allProjects.filter(project => {
@@ -60,14 +103,17 @@ export default function ExportPage() {
     ];
 
     const rows = projectsToExport.map(project => {
-      const techStackIds = mockStore.getProjectTechStacks(project.id);
-      const techStacks = mockStore.getTechStacksByIds(techStackIds);
-      const techStackNames = techStacks.map(t => t.name).join(', ');
+      const stackIds = projectTechStacks[project.id] || [];
+      const projectStacks = techStacks.filter(ts => stackIds.includes(ts.id));
+      const techStackNames = projectStacks.map(t => t.name).join(', ');
+
+      const role = roles.find(r => r.id === project.role_id);
+      const category = categories.find(c => c.id === project.category_id);
 
       return [
         project.name,
-        mockStore.getRoleName(project.role_id),
-        mockStore.getCategoryName(project.category_id),
+        role?.name || '',
+        category?.name || '',
         project.project_description || '',
         project.responsibilities || '',
         techStackNames,
@@ -101,6 +147,19 @@ export default function ExportPage() {
     document.body.removeChild(link);
   };
 
+  if (loading) {
+    return (
+      <div className="flex">
+        <Sidebar />
+        <div className="flex-1 bg-gray-50 p-8">
+          <div className="max-w-7xl mx-auto text-center">
+            <p className="text-gray-600">Loading...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex">
       <Sidebar />
@@ -116,14 +175,14 @@ export default function ExportPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={selectAll}
-                    className="text-sm text-indigo-600 hover:underline"
+                    className="text-sm text-orange-600 hover:underline"
                   >
                     Select All
                   </button>
                   <span className="text-gray-400">|</span>
                   <button
                     onClick={clearAll}
-                    className="text-sm text-indigo-600 hover:underline"
+                    className="text-sm text-orange-600 hover:underline"
                   >
                     Clear All
                   </button>
@@ -133,9 +192,11 @@ export default function ExportPage() {
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {filteredProjects.length > 0 ? (
                   filteredProjects.map(project => {
-                    const techStackIds = mockStore.getProjectTechStacks(project.id);
-                    const techStacks = mockStore.getTechStacksByIds(techStackIds);
-                    const techStackNames = techStacks.slice(0, 3).map(t => t.name).join(', ');
+                    const stackIds = projectTechStacks[project.id] || [];
+                    const projectStacks = techStacks.filter(ts => stackIds.includes(ts.id));
+                    const techStackNames = projectStacks.slice(0, 3).map(t => t.name).join(', ');
+                    const role = roles.find(r => r.id === project.role_id);
+                    const category = categories.find(c => c.id === project.category_id);
 
                     return (
                       <label
@@ -151,11 +212,11 @@ export default function ExportPage() {
                         <div className="flex-1">
                           <div className="font-semibold">{project.name}</div>
                           <div className="text-sm text-gray-600">
-                            {mockStore.getRoleName(project.role_id)} • {mockStore.getCategoryName(project.category_id)}
+                            {role?.name || 'N/A'} • {category?.name || 'N/A'}
                           </div>
                           {techStackNames && (
                             <div className="text-xs text-gray-500 mt-1">
-                              {techStackNames}{techStacks.length > 3 ? '...' : ''}
+                              {techStackNames}{projectStacks.length > 3 ? '...' : ''}
                             </div>
                           )}
                         </div>
@@ -212,9 +273,10 @@ export default function ExportPage() {
                   <button
                     onClick={handleExport}
                     disabled={selectedProjects.length === 0}
-                    className="w-full px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                    className="w-full px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
                   >
-                    📥 Export CSV ({selectedProjects.length})
+                    <Download className="w-5 h-5" />
+                    Export CSV ({selectedProjects.length})
                   </button>
                   <p className="text-xs text-gray-500">
                     CSV file will include project details, tech stacks, and dates for resume building.

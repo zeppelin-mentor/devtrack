@@ -290,3 +290,19 @@ export async function getProjectsUsingTechStack(techStackId: string, userId: str
   
   return count || 0;
 }
+
+// Export helper function
+export async function getProjectsWithDetails(userId: string, projectIds: string[]) {
+  const { data, error } = await supabase
+    .from('projects')
+    .select(`
+      *,
+      categories(name),
+      roles(name)
+    `)
+    .eq('user_id', userId)
+    .in('id', projectIds);
+  
+  if (error) throw error;
+  return data;
+}

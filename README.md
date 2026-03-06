@@ -60,7 +60,24 @@ The database schema is automatically created using Supabase migrations. The foll
 
 Row Level Security (RLS) policies are enabled to ensure users can only access their own data.
 
-5. Run the development server:
+5. OAuth Setup (Optional):
+
+To enable Google and GitHub authentication:
+
+**Google OAuth:**
+1. Go to Supabase Dashboard → Authentication → Providers
+2. Enable Google provider
+3. Add your Google OAuth credentials (Client ID and Secret)
+4. Add authorized redirect URL: `https://your-project.supabase.co/auth/v1/callback`
+
+**GitHub OAuth:**
+1. Go to Supabase Dashboard → Authentication → Providers
+2. Enable GitHub provider
+3. Create a GitHub OAuth App at https://github.com/settings/developers
+4. Add callback URL: `https://your-project.supabase.co/auth/v1/callback`
+5. Copy Client ID and Secret to Supabase
+
+6. Run the development server:
 
 ```bash
 npm run dev

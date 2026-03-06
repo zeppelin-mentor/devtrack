@@ -1,15 +1,84 @@
 'use client';
 
-import { use } from 'react';
+import { use, useEffect, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import Link from 'next/link';
-import { mockStore } from '@/lib/mockStore';
-import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/supabase/AuthProvider';
+import { getProject, getProjectTechStacks, getTechStacks, getCategories, getRoles, getGmailAccounts, getGitHubAccounts } from '@/lib/supabase/database';
+import type { Project, TechStack, Category, Role, GmailAccount, GitHubAccount } from '@/types';
+import { ArrowLeft, Edit } from 'lucide-react';
 
 export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const router = useRouter();
-  const project = mockStore.getProject(id);
+  const { user } = useAuth();
+  const [project, setProject] = useState<Project | null>(null);
+  const [techStacks, setTechStacks] = useState<TechStack[]>([]);
+  const [category, setCategory] = useState<string>('');
+  const [role, setRole] = useState<string>('');
+  const [gmailAccount, setGmailAccount] = useState<GmailAccount | null>(null);
+  const [githubAccount, setGithubAccount] = useState<GitHubAccount | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      loadProject();
+    }
+  }, [user, id]);
+
+  const loadProject = async () => {
+    try {
+      setLoading(true);
+      const projectData = await getProject(id);
+      setProject(projectData);
+
+      // Load related data
+      const [techStackIds, allTechStacks, categories, roles, gmailAccounts, githubAccounts] = await Promise.all([
+        getProjectTechStacks(id),
+        getTechStacks(),
+        getCategories(),
+        getRoles(),
+        getGmailAccounts(user!.id),
+        getGitHubAccounts(user!.id),
+      ]);
+
+      const projectStacks = allTechStacks.filter(ts => techStackIds.includes(ts.id));
+      setTechStacks(projectStacks);
+
+      const cat = categories.find(c => c.id === projectData.category_id);
+      setCategory(cat?.name || 'N/A');
+
+      const r = roles.find(r => r.id === projectData.role_id);
+      setRole(r?.name || 'N/A');
+
+      if (projectData.gmail_id) {
+        const gmail = gmailAccounts.find(a => a.id === projectData.gmail_id);
+        setGmailAccount(gmail || null);
+      }
+
+      if (projectData.github_id) {
+        const github = githubAccounts.find(a => a.id === projectData.github_id);
+        setGithubAccount(github || null);
+      }
+    } catch (error) {
+      console.error('Error loading project:', error);
+      setProject(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex">
+        <Sidebar />
+        <div className="flex-1 bg-gray-50 p-8">
+          <div className="max-w-4xl mx-auto text-center">
+            <p className="text-gray-600">Loading...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!project) {
     return (
@@ -18,7 +87,8 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         <div className="flex-1 bg-gray-50 p-8">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-2xl font-bold mb-4">Project Not Found</h1>
-            <Link href="/projects" className="text-indigo-600 hover:underline">
+            <Link href="/projects" className="text-orange-600 hover:underline flex items-center justify-center gap-2">
+              <ArrowLeft className="w-4 h-4" />
               Back to Projects
             </Link>
           </div>
@@ -26,13 +96,6 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
       </div>
     );
   }
-
-  const techStackIds = mockStore.getProjectTechStacks(project.id);
-  const techStacks = mockStore.getTechStacksByIds(techStackIds);
-  const category = mockStore.getCategoryName(project.category_id);
-  const role = mockStore.getRoleName(project.role_id);
-  const gmailAccount = project.gmail_id ? mockStore.getGmailAccounts().find(a => a.id === project.gmail_id) : null;
-  const githubAccount = project.github_id ? mockStore.getGitHubAccounts().find(a => a.id === project.github_id) : null;
 
   return (
     <div className="flex">
@@ -43,15 +106,10 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             <h1 className="text-3xl font-bold">{project.name}</h1>
             <div className="flex gap-2">
               <Link
-                href={`/projects/edit/${project.id}`}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
-              >
-                Edit
-              </Link>
-              <Link
                 href="/projects"
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition flex items-center gap-2"
               >
+                <ArrowLeft className="w-4 h-4" />
                 Back
               </Link>
             </div>
@@ -62,11 +120,11 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <label className="text-sm font-medium text-gray-500">Category</label>
-                <p className="mt-1 text-gray-900">{category || 'N/A'}</p>
+                <p className="mt-1 text-gray-900">{category}</p>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-500">Role</label>
-                <p className="mt-1 text-gray-900">{role || 'N/A'}</p>
+                <p className="mt-1 text-gray-900">{role}</p>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-500">Project Type</label>
@@ -110,7 +168,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                   {techStacks.map(stack => (
                     <span
                       key={stack.id}
-                      className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm"
+                      className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm"
                     >
                       {stack.name}
                     </span>
@@ -141,7 +199,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                       href={project.domain}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-indigo-600 hover:underline"
+                      className="text-orange-600 hover:underline"
                     >
                       {project.domain}
                     </a>
@@ -156,7 +214,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
                       href={project.repo_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-indigo-600 hover:underline"
+                      className="text-orange-600 hover:underline"
                     >
                       {project.repo_url}
                     </a>
