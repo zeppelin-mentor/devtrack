@@ -212,6 +212,13 @@ export default function ProjectsPage() {
                             >
                               <Eye className="w-4 h-4" />
                             </Link>
+                            <Link
+                              href={`/projects/edit/${project.id}`}
+                              className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+                              title="Edit"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Link>
                             <button
                               onClick={() => handleDelete(project.id, project.name)}
                               className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"

@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useAuth } from '@/lib/supabase/AuthProvider';
-import { getGitHubAccounts, createGitHubAccount, updateGitHubAccount, deleteGitHubAccount, getProjectsUsingGitHub } from '@/lib/supabase/database';
+import { getGitHubAccounts, createGitHubAccount, updateGitHubAccount, deleteGitHubAccount, getProjectsUsingGitHub, getGmailAccounts } from '@/lib/supabase/database';
 import { Plus, Edit, Trash2, X } from 'lucide-react';
-import type { GitHubAccount } from '@/types';
+import type { GitHubAccount, GmailAccount } from '@/types';
 
 import Loader from '@/components/Loader';
 
@@ -15,6 +15,7 @@ export default function GitHubAccountsPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingAccount, setEditingAccount] = useState<GitHubAccount | null>(null);
   const [accounts, setAccounts] = useState<GitHubAccount[]>([]);
+  const [gmailAccounts, setGmailAccounts] = useState<GmailAccount[]>([]);
   const [projectCounts, setProjectCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
 
@@ -26,8 +27,13 @@ export default function GitHubAccountsPage() {
 
   const loadData = async () => {
     try {
-      const accountsData = await getGitHubAccounts(user!.id);
+      const [accountsData, gmailData] = await Promise.all([
+        getGitHubAccounts(user!.id),
+        getGmailAccounts(user!.id),
+      ]);
+      
       setAccounts(accountsData);
+      setGmailAccounts(gmailData);
 
       const counts: Record<string, number> = {};
       for (const account of accountsData) {
@@ -45,10 +51,14 @@ export default function GitHubAccountsPage() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
 
+    const gmailId = formData.get('gmail_id') as string;
+    const selectedGmail = gmailAccounts.find(g => g.id === gmailId);
+
     const accountData = {
       user_id: user!.id,
       username: formData.get('username') as string,
-      email: formData.get('email') as string,
+      email: selectedGmail?.email || '',
+      gmail_id: gmailId || undefined,
       ssh_key: formData.get('ssh_key') as string || undefined,
       notes: formData.get('notes') as string || undefined,
     };
@@ -83,6 +93,12 @@ export default function GitHubAccountsPage() {
         alert('Failed to delete account');
       }
     }
+  };
+
+  const getGmailEmail = (gmailId?: string) => {
+    if (!gmailId) return 'Not linked';
+    const gmail = gmailAccounts.find(g => g.id === gmailId);
+    return gmail?.email || 'Unknown';
   };
 
   const handleCloseModal = () => {
@@ -138,7 +154,14 @@ export default function GitHubAccountsPage() {
                     accounts.map((account) => (
                       <tr key={account.id} className="hover:bg-slate-50 transition-colors">
                         <td className="px-6 py-4 text-sm font-medium text-slate-900">{account.username}</td>
-                        <td className="px-6 py-4 text-sm text-slate-600">{account.email}</td>
+                        <td className="px-6 py-4 text-sm text-slate-600">
+                          <div>
+                            <div className="font-medium">{account.email}</div>
+                            <div className="text-xs text-slate-500">
+                              {account.gmail_id ? `Linked to: ${getGmailEmail(account.gmail_id)}` : 'No Gmail linked'}
+                            </div>
+                          </div>
+                        </td>
                         <td className="px-6 py-4">
                           <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
                             {projectCounts[account.id] || 0} projects
@@ -192,8 +215,21 @@ export default function GitHubAccountsPage() {
                       <input type="text" name="username" required defaultValue={editingAccount?.username} className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all" placeholder="devuser" />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">Email *</label>
-                      <input type="email" name="email" required defaultValue={editingAccount?.email} className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all" placeholder="dev@example.com" />
+                      <label className="block text-sm font-medium text-slate-700 mb-2">Associated Gmail Account *</label>
+                      <select 
+                        name="gmail_id" 
+                        required 
+                        defaultValue={editingAccount?.gmail_id || ''}
+                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all"
+                      >
+                        <option value="">Select Gmail Account</option>
+                        {gmailAccounts.map(gmail => (
+                          <option key={gmail.id} value={gmail.id}>{gmail.email}</option>
+                        ))}
+                      </select>
+                      <p className="text-xs text-slate-500 mt-1">
+                        The email from the selected Gmail account will be used
+                      </p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-slate-700 mb-2">SSH Key</label>

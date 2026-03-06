@@ -41,6 +41,7 @@ export interface GitHubAccount {
   user_id: string;
   username: string;
   email: string;
+  gmail_id?: string;
   ssh_key?: string;
   notes?: string;
   created_at: string;

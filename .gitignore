@@ -10,6 +10,7 @@
 !.yarn/releases
 !.yarn/versions
 .kiro
+social-media-captions.md
 # testing
 /coverage
 
