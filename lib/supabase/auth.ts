@@ -50,3 +50,48 @@ export async function getSession() {
   const { data: { session }, error } = await supabase.auth.getSession();
   return { session, error };
 }
+
+// Profile management
+export async function updateUserProfile(updates: { avatar_url?: string }) {
+  const { data, error } = await supabase.auth.updateUser({
+    data: updates
+  });
+  
+  if (error) throw error;
+  return data.user;
+}
+
+export async function updateUserPassword(newPassword: string) {
+  const { data, error } = await supabase.auth.updateUser({
+    password: newPassword
+  });
+  
+  if (error) throw error;
+  return data.user;
+}
+
+export async function uploadProfilePhoto(file: File, userId: string) {
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${userId}-${Date.now()}.${fileExt}`;
+  const filePath = `avatars/${fileName}`;
+
+  // Upload file to Supabase Storage
+  const { error: uploadError } = await supabase.storage
+    .from('profile-photos')
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: true
+    });
+
+  if (uploadError) throw uploadError;
+
+  // Get public URL
+  const { data: { publicUrl } } = supabase.storage
+    .from('profile-photos')
+    .getPublicUrl(filePath);
+
+  // Update user metadata
+  await updateUserProfile({ avatar_url: publicUrl });
+
+  return publicUrl;
+}
