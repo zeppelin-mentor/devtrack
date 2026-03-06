@@ -309,7 +309,7 @@ export default function Home() {
               <span className="text-white font-semibold">DevTrack</span>
             </div>
             <div className="text-sm">
-              © 2024 DevTrack. All rights reserved.
+              © 2026 DevTrack. All rights reserved.
             </div>
             <div className="flex gap-6 text-sm">
               <Link href="/privacy" className="hover:text-white transition-colors">
