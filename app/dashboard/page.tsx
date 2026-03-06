@@ -3,6 +3,7 @@
 import Sidebar from '@/components/Sidebar';
 import Link from 'next/link';
 import { mockStore } from '@/lib/mockStore';
+import { FolderKanban, Mail, Github, Layers, Plus, ArrowRight } from 'lucide-react';
 
 export default function DashboardPage() {
   const projects = mockStore.getProjects();
@@ -11,10 +12,10 @@ export default function DashboardPage() {
   const techStacks = mockStore.getTechStacks();
 
   const stats = [
-    { label: 'Total Projects', value: projects.length, icon: '📁', color: 'bg-blue-500' },
-    { label: 'Gmail Accounts', value: gmailAccounts.length, icon: '📧', color: 'bg-green-500' },
-    { label: 'GitHub Accounts', value: githubAccounts.length, icon: '🐙', color: 'bg-purple-500' },
-    { label: 'Tech Stacks', value: techStacks.length, icon: '⚙️', color: 'bg-orange-500' },
+    { label: 'Total Projects', value: projects.length, icon: FolderKanban, color: 'bg-blue-500', lightColor: 'bg-blue-50', textColor: 'text-blue-600' },
+    { label: 'Gmail Accounts', value: gmailAccounts.length, icon: Mail, color: 'bg-green-500', lightColor: 'bg-green-50', textColor: 'text-green-600' },
+    { label: 'GitHub Accounts', value: githubAccounts.length, icon: Github, color: 'bg-purple-500', lightColor: 'bg-purple-50', textColor: 'text-purple-600' },
+    { label: 'Tech Stacks', value: techStacks.length, icon: Layers, color: 'bg-orange-500', lightColor: 'bg-orange-50', textColor: 'text-orange-600' },
   ];
 
   const recentProjects = projects.slice(0, 3).map(p => ({
@@ -25,89 +26,100 @@ export default function DashboardPage() {
   }));
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
-      <div className="flex-1 bg-gray-50 p-8">
+      <div className="flex-1 p-8">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
+            <p className="text-slate-600 mt-1">Welcome back! Here's your project overview.</p>
+          </div>
 
           {/* Statistics Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {stats.map((stat) => (
-              <div key={stat.label} className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600 text-sm">{stat.label}</p>
-                    <p className="text-3xl font-bold mt-2">{stat.value}</p>
-                  </div>
-                  <div className={`${stat.color} w-12 h-12 rounded-lg flex items-center justify-center text-2xl`}>
-                    {stat.icon}
+            {stats.map((stat) => {
+              const Icon = stat.icon;
+              return (
+                <div key={stat.label} className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-slate-600 text-sm font-medium">{stat.label}</p>
+                      <p className="text-3xl font-bold mt-2 text-slate-900">{stat.value}</p>
+                    </div>
+                    <div className={`${stat.lightColor} w-12 h-12 rounded-lg flex items-center justify-center`}>
+                      <Icon className={`w-6 h-6 ${stat.textColor}`} />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Quick Actions */}
-          <div className="bg-white rounded-lg shadow p-6 mb-8">
-            <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+            <h2 className="text-xl font-semibold mb-4 text-slate-900">Quick Actions</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <Link
                 href="/projects/create"
-                className="px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-center"
+                className="flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all shadow-sm hover:shadow font-medium"
               >
-                + Add Project
+                <Plus className="w-4 h-4" />
+                Add Project
               </Link>
               <Link
                 href="/gmail-accounts"
-                className="px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-center"
+                className="flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all shadow-sm hover:shadow font-medium"
               >
-                + Add Gmail
+                <Plus className="w-4 h-4" />
+                Add Gmail
               </Link>
               <Link
                 href="/github-accounts"
-                className="px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-center"
+                className="flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all shadow-sm hover:shadow font-medium"
               >
-                + Add GitHub
+                <Plus className="w-4 h-4" />
+                Add GitHub
               </Link>
               <Link
                 href="/export"
-                className="px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition text-center"
+                className="flex items-center justify-center gap-2 px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-all shadow-sm hover:shadow font-medium"
               >
+                <ArrowRight className="w-4 h-4" />
                 Export Data
               </Link>
             </div>
           </div>
 
           {/* Recent Projects */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4">Recent Projects</h2>
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h2 className="text-xl font-semibold mb-4 text-slate-900">Recent Projects</h2>
             <div className="space-y-3">
               {recentProjects.length > 0 ? (
                 recentProjects.map((project) => (
                   <Link
                     key={project.id}
                     href={`/projects/${project.id}`}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
+                    className="flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors border border-slate-200"
                   >
                     <div>
-                      <h3 className="font-semibold">{project.name}</h3>
-                      <p className="text-sm text-gray-600">{project.role}</p>
+                      <h3 className="font-semibold text-slate-900">{project.name}</h3>
+                      <p className="text-sm text-slate-600">{project.role}</p>
                     </div>
-                    <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm">
+                    <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">
                       {project.category}
                     </span>
                   </Link>
                 ))
               ) : (
-                <p className="text-gray-500 text-center py-4">No projects yet</p>
+                <p className="text-slate-500 text-center py-8">No projects yet</p>
               )}
             </div>
             <Link
               href="/projects"
-              className="block text-center mt-4 text-indigo-600 hover:underline"
+              className="flex items-center justify-center gap-2 mt-4 text-indigo-600 hover:text-indigo-700 font-medium"
             >
-              View All Projects →
+              View All Projects
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
