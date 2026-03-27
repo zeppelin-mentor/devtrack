@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, FolderKanban, Mail, Github, Layers, Download, LogOut, User } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, Mail, Github, Layers, Download, LogOut, User, Plug, BookOpen } from 'lucide-react';
 import { useAuth } from '@/lib/supabase/AuthProvider';
 
 const navigation = [
@@ -12,6 +12,8 @@ const navigation = [
   { name: 'Gmail Accounts', href: '/gmail-accounts', icon: Mail },
   { name: 'GitHub Accounts', href: '/github-accounts', icon: Github },
   { name: 'Tech Stacks', href: '/tech-stacks', icon: Layers },
+  { name: 'MCP Access', href: '/mcp', icon: Plug },
+  { name: 'MCP Docs', href: '/mcp/docs', icon: BookOpen },
   { name: 'Export', href: '/export', icon: Download },
 ];
 

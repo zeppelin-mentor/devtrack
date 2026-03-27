@@ -5,6 +5,10 @@ A web-based tool that helps developers track projects, accounts, tech stacks, an
 ## Features
 
 - Project management with detailed tracking
+- MCP tools for adding, editing, and listing projects while coding
+- Hosted MCP endpoint for your live app (`/api/mcp`)
+- Per-user MCP API key management
+- Default rate limiting: 100 MCP requests/day per API key
 - Gmail and GitHub account management
 - Tech stack library
 - Experience export to CSV
@@ -43,9 +47,14 @@ Create a `.env.local` file with your Supabase credentials:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_for_mcp
+MCP_API_KEY_PEPPER=optional_random_secret_for_key_hashing
 ```
 
 You can find these values in your Supabase project settings under API.
+
+`SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are used by the MCP server so coding assistants can manage projects through MCP tools.
 
 4. Database Setup:
 
@@ -84,6 +93,54 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to view the application.
+
+## MCP Support
+
+This project includes an MCP server that exposes project management tools:
+
+- `list_projects` (supports `all`, `worked`, `pending`)
+- `add_project`
+- `edit_project`
+
+Transport support:
+
+- HTTP only (`/api/mcp`)
+- Stdio is not supported
+
+### Hosted MCP (Vercel URL)
+
+Live endpoint:
+
+```text
+https://trackmydevelopement.vercel.app/api/mcp
+```
+
+How users create and use their own MCP API key:
+
+1. Sign in to DevTrack
+2. Open `/mcp` in the app sidebar
+3. Create a new MCP API key
+4. Add that key to your MCP client headers as `x-api-key`
+
+IDE setup docs page:
+
+- `/mcp/docs` (VS Code, Cursor, and Kiro setup)
+
+Rate limiting:
+
+- 100 requests/day per API key (enforced server-side)
+- Response headers include:
+  - `x-ratelimit-limit`
+  - `x-ratelimit-remaining`
+  - `x-ratelimit-reset-date`
+
+### Database Migration For MCP Keys
+
+Run SQL in Supabase SQL Editor:
+
+```sql
+-- file: supabase/migrations/20260327_add_mcp_api_keys.sql
+```
 
 ## Project Structure
 

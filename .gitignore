@@ -13,7 +13,7 @@
 social-media-captions.md
 # testing
 /coverage
-
+.vscode
 # next.js
 /.next/
 /out/

@@ -16,6 +16,7 @@ export default function ProjectsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const [projects, setProjects] = useState<Project[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
@@ -62,8 +63,13 @@ export default function ProjectsPage() {
     const matchesSearch = project.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !categoryFilter || project.category_id === categoryFilter;
     const matchesRole = !roleFilter || project.role_id === roleFilter;
-    return matchesSearch && matchesCategory && matchesRole;
+    const projectStatus = project.end_date ? 'worked' : 'pending';
+    const matchesStatus = !statusFilter || projectStatus === statusFilter;
+    return matchesSearch && matchesCategory && matchesRole && matchesStatus;
   });
+
+  const workedCount = projects.filter((project) => project.end_date).length;
+  const pendingCount = projects.length - workedCount;
 
   const handleDelete = async (id: string, name: string) => {
     if (confirm(`Are you sure you want to delete "${name}"?`)) {
@@ -128,7 +134,15 @@ export default function ProjectsPage() {
 
             {/* Search and Filter */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6">
-              <div className="flex gap-4">
+              <div className="flex flex-wrap items-center gap-3 mb-4">
+                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-sm font-medium">
+                  Worked: {workedCount}
+                </span>
+                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-sm font-medium">
+                  Pending: {pendingCount}
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-4">
                 <div className="flex-1 relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                   <input
@@ -159,6 +173,15 @@ export default function ProjectsPage() {
                     <option key={role.id} value={role.id}>{role.name}</option>
                   ))}
                 </select>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-all"
+                >
+                  <option value="">All Status</option>
+                  <option value="worked">Worked</option>
+                  <option value="pending">Pending</option>
+                </select>
               </div>
             </div>
 
@@ -170,6 +193,7 @@ export default function ProjectsPage() {
                     <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Project</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Role</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Category</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Status</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Tech Stack</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
                   </tr>
@@ -199,6 +223,17 @@ export default function ProjectsPage() {
                           <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium">
                             {getCategoryName(project.category_id)}
                           </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          {project.end_date ? (
+                            <span className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">
+                              Worked
+                            </span>
+                          ) : (
+                            <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
+                              Pending
+                            </span>
+                          )}
                         </td>
                         <td className="px-6 py-4 text-sm text-slate-700">
                           {getTechStackNames(project.id) || 'None'}
@@ -232,7 +267,7 @@ export default function ProjectsPage() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
+                      <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
                         No projects found
                       </td>
                     </tr>
