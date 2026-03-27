@@ -18,6 +18,25 @@ type McpKey = {
   created_at: string;
 };
 
+type ApiPayload = {
+  error?: string;
+  keys?: McpKey[];
+  rawKey?: string;
+};
+
+async function parseApiPayload(response: Response): Promise<ApiPayload> {
+  const raw = await response.text();
+  if (!raw.trim()) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(raw) as ApiPayload;
+  } catch {
+    return { error: raw };
+  }
+}
+
 export default function McpPage() {
   const { user } = useAuth();
   const [keys, setKeys] = useState<McpKey[]>([]);
@@ -49,7 +68,7 @@ export default function McpPage() {
         },
       });
 
-      const payload = await response.json();
+      const payload = await parseApiPayload(response);
       if (!response.ok) {
         throw new Error(payload.error || 'Failed to load API keys');
       }
@@ -91,7 +110,7 @@ export default function McpPage() {
         body: JSON.stringify({ name: keyName }),
       });
 
-      const payload = await response.json();
+      const payload = await parseApiPayload(response);
       if (!response.ok) {
         throw new Error(payload.error || 'Failed to create API key');
       }
@@ -125,7 +144,7 @@ export default function McpPage() {
         body: JSON.stringify({ id }),
       });
 
-      const payload = await response.json();
+      const payload = await parseApiPayload(response);
       if (!response.ok) {
         throw new Error(payload.error || 'Failed to revoke key');
       }
