@@ -93,9 +93,6 @@ export default function McpDocsPage() {
               <p className="text-sm text-slate-700">
                 Use DevTrack MCP for project tools (<code>list_projects</code>, <code>add_project</code>, <code>edit_project</code>).
               </p>
-              <p className="text-sm text-slate-700">
-                Use Supabase MCP for database-level operations such as migrations, schema checks, and SQL.
-              </p>
             </div>
           </div>
         </div>
