@@ -86,13 +86,87 @@ export default function McpDocsPage() {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-2">
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
               <h2 className="text-xl font-semibold text-slate-900 inline-flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-indigo-600" /> Tooling Guidance
               </h2>
               <p className="text-sm text-slate-700">
-                Use DevTrack MCP for project tools (<code>list_projects</code>, <code>add_project</code>, <code>edit_project</code>).
+                DevTrack MCP tools now cover full project lifecycle, details, export, and dependency setup.
               </p>
+
+              <div className="text-sm text-slate-700 space-y-1">
+                <p><strong>Project tools:</strong> <code>list_projects</code>, <code>get_project_details</code>, <code>add_project</code>, <code>edit_project</code>, <code>delete_project</code>, <code>export_projects</code></p>
+                <p><strong>Setup tools:</strong> <code>add_tech_stack</code>, <code>add_gmail_account</code>, <code>add_github_account</code></p>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-semibold text-slate-900">1) Add Project (with existing IDs or auto-create by names)</h3>
+                <pre className="p-3 bg-slate-100 rounded-lg overflow-x-auto text-sm"><code>{`{
+  "name": "Portfolio Revamp",
+  "project_type": "Web",
+  "category_id": "CATEGORY_ID",
+  "role_id": "ROLE_ID",
+  "project_description": "Redesigned personal site and case studies.",
+  "responsibilities": "Frontend architecture and deployment",
+  "project_highlights": "Lighthouse 95+ score",
+  "start_date": "2026-03-20",
+  "team_size": 1,
+  "client_name": "Self",
+  "hosting": "Vercel",
+  "repo_url": "https://github.com/you/portfolio",
+  "domain": "https://yourdomain.com",
+  "notes": "Built with MCP flow",
+  "status": "pending",
+  "tech_stack_ids": ["STACK_ID_1", "STACK_ID_2"],
+  "tech_stack_names": ["Next.js", "Tailwind CSS"],
+  "tech_stack_category": "Frontend"
+}`}</code></pre>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-semibold text-slate-900">2) Get Single Project Details</h3>
+                <pre className="p-3 bg-slate-100 rounded-lg overflow-x-auto text-sm"><code>{`{
+  "id": "PROJECT_ID"
+}`}</code></pre>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-semibold text-slate-900">3) Export Projects to CSV</h3>
+                <pre className="p-3 bg-slate-100 rounded-lg overflow-x-auto text-sm"><code>{`{
+  "status": "all",
+  "category_id": "OPTIONAL_CATEGORY_ID",
+  "role_id": "OPTIONAL_ROLE_ID",
+  "project_ids": ["OPTIONAL_PROJECT_ID_1", "OPTIONAL_PROJECT_ID_2"]
+}`}</code></pre>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-semibold text-slate-900">4) Add Missing Tech Stack</h3>
+                <pre className="p-3 bg-slate-100 rounded-lg overflow-x-auto text-sm"><code>{`{
+  "name": "Supabase",
+  "category": "Database",
+  "description": "Postgres, auth, storage"
+}`}</code></pre>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-semibold text-slate-900">5) Add Gmail Account</h3>
+                <pre className="p-3 bg-slate-100 rounded-lg overflow-x-auto text-sm"><code>{`{
+  "email": "dev@example.com",
+  "recovery_email": "recovery@example.com",
+  "notes": "Primary dev mailbox"
+}`}</code></pre>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-semibold text-slate-900">6) Add GitHub Account</h3>
+                <pre className="p-3 bg-slate-100 rounded-lg overflow-x-auto text-sm"><code>{`{
+  "username": "devuser",
+  "gmail_id": "GMAIL_ID",
+  "ssh_key": "ssh-rsa AAAA...",
+  "notes": "Main OSS account"
+}`}</code></pre>
+              </div>
             </div>
           </div>
         </div>
