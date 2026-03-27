@@ -191,6 +191,92 @@ async function resolveTechStackIds(
   return uniqueStrings([...ids, ...createdOrFoundIds]);
 }
 
+async function findOrCreateCategoryId(
+  supabaseAdmin: ReturnType<typeof getSupabaseAdmin>,
+  name: string,
+) {
+  const normalizedName = name.trim();
+  if (!normalizedName) {
+    return null;
+  }
+
+  const existing = await supabaseAdmin
+    .from('categories')
+    .select('id')
+    .ilike('name', normalizedName)
+    .limit(1)
+    .maybeSingle();
+
+  const existingRow = (existing.data || null) as { id?: string } | null;
+
+  if (existing.error) {
+    throw new Error(`Failed to find category \"${normalizedName}\": ${existing.error.message}`);
+  }
+
+  if (existingRow?.id) {
+    return existingRow.id;
+  }
+
+  const created = await supabaseAdmin
+    .from('categories')
+    .insert([
+      {
+        name: normalizedName,
+      },
+    ] as never[])
+    .select('id')
+    .single();
+
+  if (created.error) {
+    throw new Error(`Failed to create category \"${normalizedName}\": ${created.error.message}`);
+  }
+
+  return (created.data as { id: string }).id;
+}
+
+async function findOrCreateRoleId(
+  supabaseAdmin: ReturnType<typeof getSupabaseAdmin>,
+  name: string,
+) {
+  const normalizedName = name.trim();
+  if (!normalizedName) {
+    return null;
+  }
+
+  const existing = await supabaseAdmin
+    .from('roles')
+    .select('id')
+    .ilike('name', normalizedName)
+    .limit(1)
+    .maybeSingle();
+
+  const existingRow = (existing.data || null) as { id?: string } | null;
+
+  if (existing.error) {
+    throw new Error(`Failed to find role \"${normalizedName}\": ${existing.error.message}`);
+  }
+
+  if (existingRow?.id) {
+    return existingRow.id;
+  }
+
+  const created = await supabaseAdmin
+    .from('roles')
+    .insert([
+      {
+        name: normalizedName,
+      },
+    ] as never[])
+    .select('id')
+    .single();
+
+  if (created.error) {
+    throw new Error(`Failed to create role \"${normalizedName}\": ${created.error.message}`);
+  }
+
+  return (created.data as { id: string }).id;
+}
+
 async function buildProjectDetails(
   supabaseAdmin: ReturnType<typeof getSupabaseAdmin>,
   userId: string,
@@ -351,7 +437,9 @@ export function createProjectsMcpServerForUser(userId: string) {
         name: z.string().min(1),
         project_type: z.string().optional(),
         category_id: z.string().optional(),
+        category_name: z.string().min(1).optional(),
         role_id: z.string().optional(),
+        role_name: z.string().min(1).optional(),
         project_description: z.string().optional(),
         responsibilities: z.string().optional(),
         project_highlights: z.string().optional(),
@@ -371,10 +459,31 @@ export function createProjectsMcpServerForUser(userId: string) {
         status: mutationStatusEnum.default('pending'),
       }),
     },
-    async ({ status, tech_stack_ids, tech_stack_names, tech_stack_category, ...payload }) => {
+    async ({
+      status,
+      category_id,
+      category_name,
+      role_id,
+      role_name,
+      tech_stack_ids,
+      tech_stack_names,
+      tech_stack_category,
+      ...payload
+    }) => {
+      const resolvedCategoryId = category_id || (category_name
+        ? await findOrCreateCategoryId(supabaseAdmin, category_name)
+        : null);
+      const resolvedRoleId = role_id || (role_name ? await findOrCreateRoleId(supabaseAdmin, role_name) : null);
+
+      if (!resolvedCategoryId || !resolvedRoleId) {
+        throw new Error('add_project requires category_id/category_name and role_id/role_name.');
+      }
+
       const insertPayload: Record<string, unknown> = {
         ...payload,
         user_id: userId,
+        category_id: resolvedCategoryId,
+        role_id: resolvedRoleId,
       };
 
       if (status === 'worked' && !insertPayload.end_date) {
@@ -429,7 +538,9 @@ export function createProjectsMcpServerForUser(userId: string) {
         name: z.string().optional(),
         project_type: z.string().optional(),
         category_id: z.string().optional(),
+        category_name: z.string().min(1).optional(),
         role_id: z.string().optional(),
+        role_name: z.string().min(1).optional(),
         project_description: z.string().optional(),
         responsibilities: z.string().optional(),
         project_highlights: z.string().optional(),
@@ -449,8 +560,31 @@ export function createProjectsMcpServerForUser(userId: string) {
         status: mutationStatusEnum.optional(),
       }),
     },
-    async ({ id, status, tech_stack_ids, tech_stack_names, tech_stack_category, ...updates }) => {
+    async ({
+      id,
+      status,
+      category_id,
+      category_name,
+      role_id,
+      role_name,
+      tech_stack_ids,
+      tech_stack_names,
+      tech_stack_category,
+      ...updates
+    }) => {
       const updatePayload: Record<string, unknown> = { ...updates };
+
+      if (category_id) {
+        updatePayload.category_id = category_id;
+      } else if (category_name) {
+        updatePayload.category_id = await findOrCreateCategoryId(supabaseAdmin, category_name);
+      }
+
+      if (role_id) {
+        updatePayload.role_id = role_id;
+      } else if (role_name) {
+        updatePayload.role_id = await findOrCreateRoleId(supabaseAdmin, role_name);
+      }
 
       if (status === 'worked' && !updatePayload.end_date) {
         updatePayload.end_date = new Date().toISOString().slice(0, 10);

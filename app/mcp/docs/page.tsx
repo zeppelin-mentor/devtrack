@@ -101,11 +101,14 @@ export default function McpDocsPage() {
 
               <div className="space-y-2">
                 <h3 className="font-semibold text-slate-900">1) Add Project (with existing IDs or auto-create by names)</h3>
+                <p className="text-xs text-slate-600">Provide category and role using either IDs or names.</p>
                 <pre className="p-3 bg-slate-100 rounded-lg overflow-x-auto text-sm"><code>{`{
   "name": "Portfolio Revamp",
   "project_type": "Web",
   "category_id": "CATEGORY_ID",
+  "category_name": "Web Development",
   "role_id": "ROLE_ID",
+  "role_name": "Full Stack Developer",
   "project_description": "Redesigned personal site and case studies.",
   "responsibilities": "Frontend architecture and deployment",
   "project_highlights": "Lighthouse 95+ score",
