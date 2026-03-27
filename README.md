@@ -162,6 +162,8 @@ Run SQL in Supabase SQL Editor:
 - [Product Requirements (PRD)](./doc/prd.md)
 - [Database Requirements (DRD)](./doc/drd.md)
 - [Technical Requirements (TRD)](./doc/trd.md)
+- [Future Work: Pages Feature Roadmap](./doc/future-work-pages-feature.md)
+- [Continuous Improvements Log](./doc/continuous-improvements.md)
 
 ## Key Features
 
