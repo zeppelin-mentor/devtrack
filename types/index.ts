@@ -27,6 +27,27 @@ export interface Project {
   created_at: string;
 }
 
+export type PageStatus = 'draft' | 'published' | 'archived';
+
+export interface Page {
+  id: string;
+  user_id: string;
+  project_id?: string | null;
+  parent_id?: string | null;
+  title: string;
+  slug?: string | null;
+  content: string;
+  status: PageStatus;
+  icon?: string | null;
+  cover_url?: string | null;
+  is_public: boolean;
+  share_token?: string | null;
+  view_count: number;
+  last_viewed_at?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface GmailAccount {
   id: string;
   user_id: string;

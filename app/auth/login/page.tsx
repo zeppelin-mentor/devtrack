@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, ArrowRight, Eye, EyeOff, Sparkles } from 'lucide-react';
 import { signIn, signInWithGoogle, signInWithGitHub } from '@/lib/supabase/auth';
+import { validateLoginInput } from '@/lib/authValidation';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,11 +14,35 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(() => {
+    if (typeof window === 'undefined') {
+      return '';
+    }
+
+    return new URLSearchParams(window.location.search).get('verified') === '1'
+      ? 'Email verified. You can now log in.'
+      : '';
+  });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const verified = new URLSearchParams(window.location.search).get('verified');
+    if (verified === '1') {
+      window.history.replaceState(null, '', '/auth/login');
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
+
+    const parsed = validateLoginInput(email, password);
+    if (!parsed.success) {
+      setError(parsed.error.issues[0]?.message || 'Invalid login details');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -32,7 +57,7 @@ export default function LoginPage() {
       if (data.user) {
         router.push('/dashboard');
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred');
       setLoading(false);
     }
@@ -45,7 +70,7 @@ export default function LoginPage() {
       if (error) {
         setError(error.message);
       }
-    } catch (err) {
+    } catch {
       setError('Failed to sign in with Google');
     }
   };
@@ -57,7 +82,7 @@ export default function LoginPage() {
       if (error) {
         setError(error.message);
       }
-    } catch (err) {
+    } catch {
       setError('Failed to sign in with GitHub');
     }
   };
@@ -93,6 +118,13 @@ export default function LoginPage() {
             <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6 text-sm flex items-center gap-2 animate-fade-in-down">
               <div className="w-2 h-2 bg-red-500 rounded-full" />
               {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-4 rounded-xl mb-6 text-sm flex items-center gap-2 animate-fade-in-down">
+              <div className="w-2 h-2 bg-emerald-500 rounded-full" />
+              {success}
             </div>
           )}
 
@@ -213,7 +245,7 @@ export default function LoginPage() {
 
           {/* Sign Up Link */}
           <p className="text-center mt-8 text-slate-600">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/auth/signup" className="text-indigo-600 hover:text-indigo-700 font-semibold transition-colors inline-flex items-center gap-1 group">
               Sign up
               <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" />

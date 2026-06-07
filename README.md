@@ -50,11 +50,18 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_URL=your_supabase_project_url
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_for_mcp
 MCP_API_KEY_PEPPER=optional_random_secret_for_key_hashing
+RESEND_API_KEY=your_resend_api_key
+RESEND_FROM_EMAIL=DevTrack <noreply@email.zeppelinlabs.digital>
+NEXT_PUBLIC_SITE_URL=https://devtrack.zeppelinlabs.digital
 ```
 
 You can find these values in your Supabase project settings under API.
 
 `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are used by the MCP server so coding assistants can manage projects through MCP tools.
+
+`RESEND_API_KEY` and `RESEND_FROM_EMAIL` are used by server-side email verification and password reset emails. The sending domain must be verified in Resend.
+
+`NEXT_PUBLIC_SITE_URL` controls the verification and password reset email links. Use `http://localhost:3000` locally and `https://devtrack.zeppelinlabs.digital` in production.
 
 4. Database Setup:
 

@@ -3,12 +3,13 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, FolderKanban, Mail, Github, Layers, Download, LogOut, User, Plug, BookOpen } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, Mail, Github, Layers, Download, LogOut, User, Plug, BookOpen, FileText } from 'lucide-react';
 import { useAuth } from '@/lib/supabase/AuthProvider';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Projects', href: '/projects', icon: FolderKanban },
+  { name: 'Pages', href: '/pages', icon: FileText },
   { name: 'Gmail Accounts', href: '/gmail-accounts', icon: Mail },
   { name: 'GitHub Accounts', href: '/github-accounts', icon: Github },
   { name: 'Tech Stacks', href: '/tech-stacks', icon: Layers },

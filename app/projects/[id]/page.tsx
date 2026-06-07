@@ -4,9 +4,9 @@ import { use, useEffect, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import Link from 'next/link';
 import { useAuth } from '@/lib/supabase/AuthProvider';
-import { getProject, getProjectTechStacks, getTechStacks, getCategories, getRoles, getGmailAccounts, getGitHubAccounts } from '@/lib/supabase/database';
-import type { Project, TechStack, Category, Role, GmailAccount, GitHubAccount } from '@/types';
-import { ArrowLeft } from 'lucide-react';
+import { getProject, getProjectTechStacks, getTechStacks, getCategories, getRoles, getGmailAccounts, getGitHubAccounts, getPages } from '@/lib/supabase/database';
+import type { Project, TechStack, GmailAccount, GitHubAccount, Page } from '@/types';
+import { ArrowLeft, FileText, Plus } from 'lucide-react';
 import Loader from '@/components/Loader';
 
 export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -18,6 +18,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   const [role, setRole] = useState<string>('');
   const [gmailAccount, setGmailAccount] = useState<GmailAccount | null>(null);
   const [githubAccount, setGithubAccount] = useState<GitHubAccount | null>(null);
+  const [linkedPages, setLinkedPages] = useState<Page[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -33,13 +34,14 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
       setProject(projectData);
 
       // Load related data
-      const [techStackIds, allTechStacks, categories, roles, gmailAccounts, githubAccounts] = await Promise.all([
+      const [techStackIds, allTechStacks, categories, roles, gmailAccounts, githubAccounts, pages] = await Promise.all([
         getProjectTechStacks(id),
         getTechStacks(),
         getCategories(),
         getRoles(),
         getGmailAccounts(user!.id),
         getGitHubAccounts(user!.id),
+        getPages(user!.id, { projectId: id }),
       ]);
 
       const projectStacks = allTechStacks.filter(ts => techStackIds.includes(ts.id));
@@ -60,6 +62,8 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         const github = githubAccounts.find(a => a.id === projectData.github_id);
         setGithubAccount(github || null);
       }
+
+      setLinkedPages(pages);
     } catch (error) {
       console.error('Error loading project:', error);
       setProject(null);
@@ -259,6 +263,49 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
               <div>
                 <label className="text-sm font-medium text-gray-500">Notes</label>
                 <p className="mt-1 text-gray-900">{project.notes}</p>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-6 rounded-lg bg-white p-6 shadow">
+            <div className="mb-4 flex items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">Linked Pages</h2>
+                <p className="text-sm text-gray-500">Project notes, docs, and articles attached to this project.</p>
+              </div>
+              <Link
+                href={`/pages/create?projectId=${project.id}`}
+                className="flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-700"
+              >
+                <Plus className="h-4 w-4" />
+                New Page
+              </Link>
+            </div>
+
+            {linkedPages.length > 0 ? (
+              <div className="grid gap-3">
+                {linkedPages.map((page) => (
+                  <Link
+                    key={page.id}
+                    href={`/pages/${page.id}`}
+                    className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition hover:border-indigo-200 hover:bg-indigo-50"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                        {page.icon || <FileText className="h-5 w-5" />}
+                      </span>
+                      <div>
+                        <p className="font-medium text-slate-900">{page.title}</p>
+                        <p className="text-sm capitalize text-slate-500">{page.status}</p>
+                      </div>
+                    </div>
+                    <span className="text-sm text-slate-500">{new Date(page.updated_at).toLocaleDateString()}</span>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-lg border border-dashed border-slate-300 px-4 py-8 text-center text-slate-500">
+                No linked pages yet
               </div>
             )}
           </div>

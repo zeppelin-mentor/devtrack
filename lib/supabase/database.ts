@@ -1,5 +1,5 @@
 import { supabase } from './client';
-import type { Project, GmailAccount, GitHubAccount, TechStack, Category, Role } from '@/types';
+import type { Project, GmailAccount, GitHubAccount, TechStack, Category, Role, Page } from '@/types';
 
 // Projects
 export async function getProjects(userId: string) {
@@ -53,6 +53,115 @@ export async function deleteProject(id: string) {
     .delete()
     .eq('id', id);
   
+  if (error) throw error;
+  return true;
+}
+
+// Pages
+export async function getPages(userId: string, options?: { query?: string; projectId?: string; status?: string }) {
+  let request = supabase
+    .from('pages')
+    .select('*')
+    .eq('user_id', userId)
+    .order('updated_at', { ascending: false });
+
+  if (options?.projectId) {
+    request = request.eq('project_id', options.projectId);
+  }
+
+  if (options?.status) {
+    request = request.eq('status', options.status);
+  }
+
+  if (options?.query) {
+    const escapedQuery = options.query.replace(/[%_]/g, '\\$&');
+    request = request.or(`title.ilike.%${escapedQuery}%,content.ilike.%${escapedQuery}%`);
+  }
+
+  const { data, error } = await request;
+
+  if (error) throw error;
+  return data as Page[];
+}
+
+export async function getPage(id: string) {
+  const { data, error } = await supabase
+    .from('pages')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) throw error;
+  return data as Page;
+}
+
+export async function createPage(page: Omit<Page, 'id' | 'created_at' | 'updated_at' | 'view_count'>) {
+  const { data, error } = await supabase
+    .from('pages')
+    .insert([page])
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data as Page;
+}
+
+export async function updatePage(id: string, updates: Partial<Omit<Page, 'id' | 'user_id' | 'created_at' | 'updated_at' | 'view_count'>>) {
+  const { data, error } = await supabase
+    .from('pages')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data as Page;
+}
+
+// Generate share token for a page
+export async function generateShareToken(pageId: string): Promise<string> {
+  const { data, error } = await supabase.rpc('generate_share_token');
+  
+  if (error) throw error;
+  
+  const token = data as string;
+  
+  // Update the page with the share token
+  const { error: updateError } = await supabase
+    .from('pages')
+    .update({ share_token: token, is_public: true })
+    .eq('id', pageId);
+  
+  if (updateError) throw updateError;
+  
+  return token;
+}
+
+// Remove share token and make page private
+export async function removeShareToken(pageId: string): Promise<void> {
+  const { error } = await supabase
+    .from('pages')
+    .update({ share_token: null, is_public: false })
+    .eq('id', pageId);
+  
+  if (error) throw error;
+}
+
+// Auto-generate slug from title
+export async function generatePageSlug(title: string): Promise<string> {
+  const { data, error } = await supabase.rpc('generate_slug', { page_title: title });
+  
+  if (error) throw error;
+  
+  return data as string;
+}
+
+export async function deletePage(id: string) {
+  const { error } = await supabase
+    .from('pages')
+    .delete()
+    .eq('id', id);
+
   if (error) throw error;
   return true;
 }

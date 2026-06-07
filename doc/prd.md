@@ -221,7 +221,48 @@ AI
 
 ---
 
-# 5.7 Experience Export
+# 5.7 Pages & Documentation
+
+Users can create Notion-style pages for project documentation, notes, and articles.
+
+### Features
+
+* Create and edit pages with Markdown support
+* Link pages to projects or create standalone pages
+* Auto-generate URL slugs for SEO-friendly sharing
+* Make pages public with shareable links
+* Track page views and engagement
+* Quick project creation from page editor
+* Autosave with change tracking
+* Templates for common documentation types
+
+### Page Fields
+
+| Field       | Description                          |
+| ----------- | ------------------------------------ |
+| title       | Page title                           |
+| content     | Markdown content                     |
+| status      | draft / published / archived         |
+| is_public   | Public sharing enabled               |
+| share_token | Unique shareable URL token           |
+| slug        | Auto-generated or custom URL slug    |
+| project_id  | Linked project (optional)            |
+| icon        | Custom emoji or icon                 |
+| cover_url   | Header cover image                   |
+| view_count  | Number of public views               |
+
+### Sharing Features
+
+* One-click public/private toggle
+* Automatic share token generation
+* Copy shareable link
+* View count tracking
+* Public page with branded layout
+* SEO-friendly URLs with slugs
+
+---
+
+# 5.8 Experience Export
 
 Users can export selected project experiences.
 
@@ -325,6 +366,76 @@ Actions
 
 ---
 
+## Pages Section
+
+### Pages List Page
+
+Columns:
+
+Page Title with Icon
+Linked Project
+Status Badge
+Public/Private Indicator
+Last Updated
+View Count (if public)
+Actions (Edit/Delete)
+
+### Create Page Screen
+
+Form inputs:
+
+Page Title
+Auto-generate Slug Toggle
+Custom Slug (optional)
+Link to Existing Project
+Create New Project (modal)
+Template Selection
+  - Blank
+  - PRD Template
+  - DRD Template
+  - TRD Template
+  - README Template
+  - API Documentation
+
+### Page Editor Screen
+
+Editor Components:
+
+Title Input with Icon
+Cover Image URL
+Markdown Editor with Toolbar
+Insert Link Helper (Ctrl/Cmd+K)
+Auto-save Indicator
+Preview Panel
+
+Sidebar Controls:
+
+Status Dropdown (Draft/Published/Archived)
+Project Selector with "Create New" Option
+Public/Private Toggle
+Share Link (when public)
+Copy Link Button
+View Count Display
+Cover URL Input
+Last Updated Timestamp
+Save Button (Ctrl/Cmd+S)
+Delete Button
+
+### Public Page View (`/share/[token]`)
+
+Elements:
+
+DevTrack Branding Header
+Page Title with Icon
+Cover Image
+Content Display (Markdown rendered)
+Status Badge
+View Count
+Last Updated Date
+Call-to-action to Create Account
+
+---
+
 ## Export Page
 
 Options:
@@ -355,13 +466,35 @@ Export CSV
 
 ---
 
-# 9. Future Features
+# 9. Implemented Features (Latest)
+
+## Pages & Documentation System ✅
+
+* Notion-style page editor with Markdown support
+* Public sharing with automatic URL generation
+* Auto-generated SEO-friendly slugs
+* Project linking with quick project creation
+* Page templates (PRD, DRD, TRD, README, API docs)
+* View count tracking for public pages
+* One-click public/private toggle
+* Shareable links with unique tokens
+* Autosave functionality
+* Change tracking with save status indicators
+
+---
+
+# 10. Future Features
 
 * GitHub repo auto import
-* AI resume generator
-* Portfolio generator
+* AI resume generator from page content
+* Portfolio website generator from public pages
 * Domain expiry tracker
 * Environment variable manager
+* Page collaboration and comments
+* Version history for pages
+* Nested page hierarchy (parent-child relationships)
+* Rich text editor (beyond Markdown)
+* Page analytics dashboard
 
 ---
 

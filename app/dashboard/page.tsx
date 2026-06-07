@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/supabase/AuthProvider';
 import { getProjects, getGmailAccounts, getGitHubAccounts, getTechStacks, getCategories, getRoles } from '@/lib/supabase/database';
 import { FolderKanban, Mail, Github, Layers, Plus, ArrowRight } from 'lucide-react';
@@ -12,6 +13,7 @@ import type { Project, Category, Role } from '@/types';
 import Loader from '@/components/Loader';
 
 export default function DashboardPage() {
+  const router = useRouter();
   const { user } = useAuth();
   const [projects, setProjects] = useState<Project[]>([]);
   const [gmailCount, setGmailCount] = useState(0);
@@ -22,10 +24,18 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+      if (hashParams.get('type') === 'recovery') {
+        router.replace(`/auth/reset-password${window.location.hash}`);
+        return;
+      }
+    }
+
     if (user) {
       loadData();
     }
-  }, [user]);
+  }, [router, user]);
 
   const loadData = async () => {
     try {
@@ -94,7 +104,7 @@ export default function DashboardPage() {
           <div className="max-w-7xl mx-auto">
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
-              <p className="text-slate-600 mt-1">Welcome back! Here's your project overview.</p>
+              <p className="text-slate-600 mt-1">Welcome back! Here&apos;s your project overview.</p>
             </div>
 
             {/* Statistics Cards */}

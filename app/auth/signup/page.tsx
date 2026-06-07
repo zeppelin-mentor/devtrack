@@ -3,38 +3,35 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { Mail, Lock, ArrowRight, Eye, EyeOff, Sparkles, CheckCircle2 } from 'lucide-react';
 import { signUp, signInWithGoogle, signInWithGitHub } from '@/lib/supabase/auth';
+import { validateSignupInput } from '@/lib/authValidation';
 
 export default function SignupPage() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
 
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters');
+    const parsed = validateSignupInput(email, password, confirmPassword);
+    if (!parsed.success) {
+      setError(parsed.error.issues[0]?.message || 'Invalid signup details');
       return;
     }
 
     setLoading(true);
 
     try {
-      const { data, error } = await signUp(email, password);
+      const { message, error } = await signUp(email, password, confirmPassword);
       
       if (error) {
         setError(error.message);
@@ -42,11 +39,13 @@ export default function SignupPage() {
         return;
       }
 
-      if (data.user) {
-        router.push('/dashboard');
-      }
-    } catch (err) {
+      setSuccess(message || 'Check your email for a verification link before logging in.');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+    } catch {
       setError('An unexpected error occurred');
+    } finally {
       setLoading(false);
     }
   };
@@ -58,7 +57,7 @@ export default function SignupPage() {
       if (error) {
         setError(error.message);
       }
-    } catch (err) {
+    } catch {
       setError('Failed to sign in with Google');
     }
   };
@@ -70,7 +69,7 @@ export default function SignupPage() {
       if (error) {
         setError(error.message);
       }
-    } catch (err) {
+    } catch {
       setError('Failed to sign in with GitHub');
     }
   };
@@ -157,6 +156,13 @@ export default function SignupPage() {
                 </div>
               )}
 
+              {success && (
+                <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-4 rounded-xl mb-6 text-sm flex items-center gap-2 animate-fade-in-down">
+                  <CheckCircle2 className="w-5 h-5" />
+                  {success}
+                </div>
+              )}
+
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Email Input */}
                 <div className="group">
@@ -200,7 +206,9 @@ export default function SignupPage() {
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
                   </div>
-                  <p className="text-xs text-slate-500 mt-1">Must be at least 8 characters</p>
+                  <p className="text-xs text-slate-500 mt-1">
+                    At least 10 characters with uppercase, lowercase, number, and symbol
+                  </p>
                 </div>
 
                 {/* Confirm Password Input */}

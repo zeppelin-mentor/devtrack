@@ -96,6 +96,7 @@ export default function McpDocsPage() {
 
               <div className="text-sm text-slate-700 space-y-1">
                 <p><strong>Project tools:</strong> <code>list_projects</code>, <code>get_project_details</code>, <code>add_project</code>, <code>edit_project</code>, <code>delete_project</code>, <code>export_projects</code></p>
+                <p><strong>Page tools:</strong> <code>list_pages</code>, <code>get_page</code>, <code>add_page</code>, <code>edit_page</code>, <code>delete_page</code>, <code>publish_page</code>, <code>unpublish_page</code></p>
                 <p><strong>Setup tools:</strong> <code>add_tech_stack</code>, <code>add_gmail_account</code>, <code>add_github_account</code></p>
               </div>
 
@@ -168,6 +169,34 @@ export default function McpDocsPage() {
   "gmail_id": "GMAIL_ID",
   "ssh_key": "ssh-rsa AAAA...",
   "notes": "Main OSS account"
+}`}</code></pre>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-semibold text-slate-900">7) Create Page with Markdown</h3>
+                <pre className="p-3 bg-slate-100 rounded-lg overflow-x-auto text-sm"><code>{`{
+  "title": "API Documentation",
+  "content": "# API Docs\\n\\n## Endpoints\\n- GET /api/projects",
+  "status": "draft",
+  "project_id": "PROJECT_ID",
+  "icon": "📄",
+  "is_public": false
+}`}</code></pre>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-semibold text-slate-900">8) Publish Page (Generate Share Link)</h3>
+                <pre className="p-3 bg-slate-100 rounded-lg overflow-x-auto text-sm"><code>{`{
+  "id": "PAGE_ID"
+}`}</code></pre>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-semibold text-slate-900">9) List Pages</h3>
+                <pre className="p-3 bg-slate-100 rounded-lg overflow-x-auto text-sm"><code>{`{
+  "query": "optional search term",
+  "project_id": "OPTIONAL_PROJECT_ID",
+  "status": "draft"
 }`}</code></pre>
               </div>
             </div>
