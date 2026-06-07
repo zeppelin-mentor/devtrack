@@ -34,7 +34,7 @@ Write high-level opportunities you want to unlock:
 | IMP-002 | UX | Add global search for projects/accounts/stacks/pages | Faster retrieval in larger datasets | P1 | M | backlog | Use Postgres FTS |
 | IMP-003 | Export | Add Markdown and JSON export formats | Better reuse for portfolios and docs | P1 | S | backlog | CSV already exists |
 | IMP-004 | Reliability | Add audit trail for critical changes | Better debugging and trust | P1 | M | backlog | Start with projects and MCP key events |
-| IMP-005 | Portfolio | Public portfolio profile with selected projects | No easy way to showcase work publicly from DevTrack | P1 | M | backlog | Add shareable profile URL |
+| IMP-005 | Portfolio | Public portfolio profile with selected projects | No easy way to showcase work publicly from DevTrack | P0 | M | documented | See `public-portfolio-profile-spec.md` for full spec |
 | IMP-006 | Project Quality | Project health status (Red/Amber/Green + blockers) | Hard to quickly identify at-risk projects | P1 | S | backlog | Add dashboard health summary |
 | IMP-007 | Automation | Resume bullet generator from project data | Manual rewriting for resume takes time | P0 | M | backlog | AI-assisted drafts + one-click copy |
 | IMP-008 | Knowledge | Notion-style project pages with templates | Project context is scattered across tools | P0 | L | backlog | Use phased roadmap in `future-work-pages-feature.md` |
