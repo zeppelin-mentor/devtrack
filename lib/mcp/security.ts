@@ -74,7 +74,10 @@ export async function findActiveApiKey(rawApiKey: string) {
 export async function consumeDailyQuota(apiKeyRow: McpApiKeyRow, dailyLimit = DEFAULT_DAILY_LIMIT) {
   const supabaseAdmin = getSupabaseAdmin();
   const today = new Date().toISOString().slice(0, 10);
-  const currentUsed = apiKeyRow.requests_date === today ? apiKeyRow.requests_today || 0 : 0;
+  
+  // Reset counter if it's a new day
+  const isNewDay = apiKeyRow.requests_date !== today;
+  const currentUsed = isNewDay ? 0 : apiKeyRow.requests_today || 0;
 
   if (currentUsed >= dailyLimit) {
     return {

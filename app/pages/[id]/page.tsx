@@ -41,19 +41,28 @@ export default function PageEditorPage({ params }: { params: Promise<{ id: strin
   const [copySuccess, setCopySuccess] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [isPublicView, setIsPublicView] = useState(false);
 
   const loadData = useCallback(async () => {
-    if (!user) {
-      return;
-    }
-
     try {
       setLoading(true);
-      const [pageData, projectsData] = await Promise.all([
-        getPage(id),
-        getProjects(user.id),
-      ]);
+      
+      // Try to load page via API (supports both authenticated and public access)
+      const token = user ? await (user as any).getIdToken() : null;
+      const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+      
+      const response = await fetch(`/api/pages/${id}`, { headers });
+      const data = await response.json();
+      
+      if (!response.ok || data.error) {
+        setPage(null);
+        setLoading(false);
+        return;
+      }
 
+      const pageData = data.page;
+      const publicView = data.isPublicView || false;
+      
       setPage(pageData);
       setTitle(pageData.title);
       setContent(pageData.content);
@@ -65,7 +74,13 @@ export default function PageEditorPage({ params }: { params: Promise<{ id: strin
       setShareToken(pageData.share_token || null);
       setDirty(false);
       setSaveStatus('saved');
-      setProjects(projectsData);
+      setIsPublicView(publicView);
+      
+      // Only load projects if user is authenticated and owns the page
+      if (user && !publicView) {
+        const projectsData = await getProjects(user.id);
+        setProjects(projectsData);
+      }
     } catch (error) {
       console.error('Error loading page:', error);
       setPage(null);
@@ -320,36 +335,78 @@ export default function PageEditorPage({ params }: { params: Promise<{ id: strin
 
   if (loading) {
     return (
-      <ProtectedRoute>
-        <div className="flex min-h-screen bg-slate-50">
-          <Sidebar />
-          <div className="flex-1">
-            <Loader />
-          </div>
+      <div className="flex min-h-screen bg-slate-50">
+        {!isPublicView && <Sidebar />}
+        <div className="flex-1">
+          <Loader />
         </div>
-      </ProtectedRoute>
+      </div>
     );
   }
 
   if (!page) {
     return (
-      <ProtectedRoute>
-        <div className="flex min-h-screen bg-slate-50">
-          <Sidebar />
-          <main className="flex-1 p-8">
-            <div className="mx-auto max-w-4xl text-center">
-              <h1 className="mb-4 text-2xl font-bold text-slate-900">Page Not Found</h1>
-              <Link href="/pages" className="inline-flex items-center gap-2 text-orange-600 hover:underline">
-                <ArrowLeft className="h-4 w-4" />
-                Back to Pages
-              </Link>
-            </div>
-          </main>
-        </div>
-      </ProtectedRoute>
+      <div className="flex min-h-screen bg-slate-50">
+        {!isPublicView && <Sidebar />}
+        <main className="flex-1 p-8">
+          <div className="mx-auto max-w-4xl text-center">
+            <h1 className="mb-4 text-2xl font-bold text-slate-900">Page Not Found</h1>
+            <Link href={isPublicView ? "/" : "/pages"} className="inline-flex items-center gap-2 text-orange-600 hover:underline">
+              <ArrowLeft className="h-4 w-4" />
+              {isPublicView ? "Home" : "Back to Pages"}
+            </Link>
+          </div>
+        </main>
+      </div>
     );
   }
 
+  // Public view - Read-only
+  if (isPublicView) {
+    return (
+      <div className="min-h-screen bg-slate-50">
+        <header className="border-b border-slate-200 bg-white">
+          <div className="mx-auto max-w-5xl px-6 py-4 flex items-center justify-between">
+            <Link href="/" className="text-xl font-bold text-gray-900">
+              DevTrack
+            </Link>
+            <div className="flex items-center gap-3 text-sm text-slate-600">
+              <span>👁️ {page.view_count || 0} views</span>
+            </div>
+          </div>
+        </header>
+        
+        <main className="mx-auto max-w-5xl px-6 py-12">
+          {coverUrl && (
+            <div className="mb-8 h-64 rounded-xl bg-cover bg-center shadow-lg" style={{ backgroundImage: `url(${coverUrl})` }} />
+          )}
+          
+          <article className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
+            <div className="mb-8 flex items-center gap-3">
+              {icon && <span className="text-4xl">{icon}</span>}
+              <h1 className="text-5xl font-bold text-slate-900">{title}</h1>
+            </div>
+            
+            <div className="prose prose-slate prose-lg max-w-none">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeSanitize, rehypeRaw]}
+              >
+                {content || '*This page is empty*'}
+              </ReactMarkdown>
+            </div>
+          </article>
+          
+          <footer className="mt-12 text-center text-sm text-slate-500">
+            <p>Published on {new Date(page.updated_at).toLocaleDateString()}</p>
+            <p className="mt-2">Powered by DevTrack</p>
+          </footer>
+        </main>
+      </div>
+    );
+  }
+
+  // Authenticated view - Editor (protected route)
   return (
     <ProtectedRoute>
       <div className="flex min-h-screen bg-slate-50">

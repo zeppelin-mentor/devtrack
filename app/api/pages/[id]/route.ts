@@ -41,24 +41,53 @@ async function authorize(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { supabase, response } = await authorize(request);
-
-  if (response) {
-    return response;
-  }
-
   const { id } = await params;
-  const { data, error } = await supabase!
+  
+  // Try authenticated access first
+  const { supabase: authedClient } = await authorize(request);
+  
+  if (authedClient) {
+    // User is authenticated, return their own page
+    const { data, error } = await authedClient
+      .from('pages')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 404 });
+    }
+
+    return NextResponse.json({ page: data });
+  }
+  
+  // Not authenticated, check if page is public
+  const publicClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+  );
+  
+  const { data, error } = await publicClient
     .from('pages')
     .select('*')
     .eq('id', id)
+    .eq('is_public', true)
     .single();
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 404 });
+  if (error || !data) {
+    return NextResponse.json({ error: 'Page not found or not public' }, { status: 404 });
   }
 
-  return NextResponse.json({ page: data });
+  // Increment view counter for public pages
+  await publicClient
+    .from('pages')
+    .update({ 
+      view_count: (data.view_count || 0) + 1,
+      last_viewed_at: new Date().toISOString()
+    })
+    .eq('id', id);
+
+  return NextResponse.json({ page: data, isPublicView: true });
 }
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {

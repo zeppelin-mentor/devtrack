@@ -87,7 +87,7 @@ export async function DELETE(request: Request) {
 
     const { error } = await supabaseAdmin
       .from('mcp_api_keys')
-      .update({ is_active: false } as never)
+      .delete()
       .eq('id', body.id)
       .eq('user_id', user.id);
 

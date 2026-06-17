@@ -25,6 +25,15 @@ export interface Project {
   domain?: string;
   notes?: string;
   created_at: string;
+  // Portfolio visibility controls
+  show_description?: boolean;
+  show_responsibilities?: boolean;
+  show_highlights?: boolean;
+  show_tech_stack?: boolean;
+  show_repo?: boolean;
+  show_dates?: boolean;
+  show_team_size?: boolean;
+  show_client?: boolean;
 }
 
 export type PageStatus = 'draft' | 'published' | 'archived';
@@ -90,4 +99,72 @@ export interface ProjectTechStack {
   id: string;
   project_id: string;
   tech_stack_id: string;
+}
+
+export interface UserProfile {
+  id: string;
+  user_id: string;
+  username: string;
+  display_name: string;
+  bio?: string | null;
+  profile_photo_url?: string | null;
+  location?: string | null;
+  // Profile visibility settings
+  is_public: boolean;
+  available_for_work: boolean;
+  show_email: boolean;
+  // Social links
+  github_url?: string | null;
+  linkedin_url?: string | null;
+  twitter_url?: string | null;
+  website_url?: string | null;
+  show_github: boolean;
+  show_linkedin: boolean;
+  show_twitter: boolean;
+  show_website: boolean;
+  // Analytics
+  view_count: number;
+  last_viewed_at?: string | null;
+  // Metadata
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PortfolioProject {
+  id: string;
+  user_id: string;
+  project_id: string;
+  is_visible: boolean;
+  display_order: number;
+  created_at: string;
+}
+
+export interface PortfolioProjectWithDetails extends PortfolioProject {
+  project: Project & {
+    tech_stacks?: TechStack[];
+    category?: Category;
+    role?: Role;
+  };
+}
+
+export interface PublicPortfolio {
+  profile: Omit<UserProfile, 'id' | 'user_id' | 'show_email' | 'view_count' | 'last_viewed_at' | 'created_at' | 'updated_at'> & {
+    email?: string;
+  };
+  projects: Array<{
+    id: string;
+    name: string;
+    project_type?: string;
+    category?: string;
+    role?: string;
+    project_description?: string;
+    responsibilities?: string;
+    project_highlights?: string;
+    start_date?: string;
+    end_date?: string;
+    team_size?: number;
+    client_name?: string;
+    repo_url?: string;
+    tech_stacks?: string[];
+  }>;
 }

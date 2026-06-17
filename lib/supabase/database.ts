@@ -415,3 +415,93 @@ export async function getProjectsWithDetails(userId: string, projectIds: string[
   if (error) throw error;
   return data;
 }
+
+// User Profile
+export async function getUserProfile(userId: string) {
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('*')
+    .eq('user_id', userId)
+    .maybeSingle();
+  
+  if (error) throw error;
+  return data;
+}
+
+export async function createUserProfile(profile: any) {
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .insert([profile])
+    .select()
+    .single();
+  
+  if (error) throw error;
+  return data;
+}
+
+export async function updateUserProfile(userId: string, updates: any) {
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .update(updates)
+    .eq('user_id', userId)
+    .select()
+    .single();
+  
+  if (error) throw error;
+  return data;
+}
+
+// Portfolio Projects
+export async function getPortfolioProjects(userId: string) {
+  const { data, error } = await supabase
+    .from('portfolio_projects')
+    .select(`
+      *,
+      project:projects(*)
+    `)
+    .eq('user_id', userId)
+    .order('display_order', { ascending: true });
+  
+  if (error) throw error;
+  return data;
+}
+
+export async function addProjectToPortfolio(userId: string, projectId: string, displayOrder: number) {
+  const { data, error } = await supabase
+    .from('portfolio_projects')
+    .insert([
+      {
+        user_id: userId,
+        project_id: projectId,
+        is_visible: true,
+        display_order: displayOrder,
+      },
+    ])
+    .select()
+    .single();
+  
+  if (error) throw error;
+  return data;
+}
+
+export async function removeProjectFromPortfolio(portfolioProjectId: string) {
+  const { error } = await supabase
+    .from('portfolio_projects')
+    .delete()
+    .eq('id', portfolioProjectId);
+  
+  if (error) throw error;
+  return true;
+}
+
+export async function updatePortfolioProjectOrder(portfolioProjectId: string, displayOrder: number) {
+  const { data, error } = await supabase
+    .from('portfolio_projects')
+    .update({ display_order: displayOrder })
+    .eq('id', portfolioProjectId)
+    .select()
+    .single();
+  
+  if (error) throw error;
+  return data;
+}
