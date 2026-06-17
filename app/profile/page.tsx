@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/supabase/AuthProvider';
+import { supabase } from '@/lib/supabase/client';
+import { getProjects } from '@/lib/supabase/database';
 import Sidebar from '@/components/Sidebar';
 import Loader from '@/components/Loader';
 import type { UserProfile, PortfolioProjectWithDetails, Project } from '@/types';
@@ -53,7 +55,9 @@ export default function ProfilePage() {
     try {
       setLoading(true);
       
-      const token = (await (user as any)?.getIdToken()) || '';
+      // Get session token from Supabase
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token || '';
 
       // Load profile
       const profileRes = await fetch('/api/profile', {
@@ -92,25 +96,10 @@ export default function ProfilePage() {
         setPortfolioProjects(portfolioData.projects);
       }
 
-      // Load all projects
-      const projectsRes = await fetch('/api/mcp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          method: 'tools/call',
-          params: {
-            name: 'list_projects',
-            arguments: { status: 'all' },
-          },
-        }),
-      });
-      const projectsData = await projectsRes.json();
-      if (projectsData.content?.[0]?.text) {
-        const parsed = JSON.parse(projectsData.content[0].text);
-        setAllProjects(parsed.projects || []);
+      // Load all projects directly from Supabase
+      if (user?.id) {
+        const projects = await getProjects(user.id);
+        setAllProjects(projects);
       }
     } catch (err) {
       console.error('Error loading data:', err);
@@ -126,7 +115,9 @@ export default function ProfilePage() {
       setError('');
       setSuccess('');
 
-      const token = (await (user as any)?.getIdToken()) || '';
+      // Get session token from Supabase
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token || '';
 
       const method = profile ? 'PUT' : 'POST';
       const res = await fetch('/api/profile', {
@@ -156,7 +147,9 @@ export default function ProfilePage() {
 
   const handleAddProjectToPortfolio = async (projectId: string) => {
     try {
-      const token = (await (user as any)?.getIdToken()) || '';
+      // Get session token from Supabase
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token || '';
 
       const res = await fetch('/api/portfolio/projects', {
         method: 'POST',
@@ -182,7 +175,9 @@ export default function ProfilePage() {
 
   const handleRemoveProjectFromPortfolio = async (portfolioProjectId: string) => {
     try {
-      const token = (await (user as any)?.getIdToken()) || '';
+      // Get session token from Supabase
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token || '';
 
       const res = await fetch(`/api/portfolio/projects/${portfolioProjectId}`, {
         method: 'DELETE',

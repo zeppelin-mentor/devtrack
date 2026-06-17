@@ -48,7 +48,11 @@ export default function PageEditorPage({ params }: { params: Promise<{ id: strin
       setLoading(true);
       
       // Try to load page via API (supports both authenticated and public access)
-      const token = user ? await (user as any).getIdToken() : null;
+      let token: string | null = null;
+      if (user) {
+        const { data: { session } } = await supabase.auth.getSession();
+        token = session?.access_token || null;
+      }
       const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
       
       const response = await fetch(`/api/pages/${id}`, { headers });
