@@ -19,6 +19,7 @@ export default function ProfilePage() {
   const [allProjects, setAllProjects] = useState<Project[]>([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [processingProjectId, setProcessingProjectId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     username: '',
@@ -147,6 +148,9 @@ export default function ProfilePage() {
 
   const handleAddProjectToPortfolio = async (projectId: string) => {
     try {
+      setProcessingProjectId(projectId);
+      setError('');
+      
       // Get session token from Supabase
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token || '';
@@ -165,16 +169,31 @@ export default function ProfilePage() {
         throw new Error(data.error || 'Failed to add project');
       }
 
-      await loadData();
+      const data = await res.json();
+      
+      // Optimistically update UI without full reload
+      const addedProject = allProjects.find(p => p.id === projectId);
+      if (addedProject && data.portfolioProject) {
+        setPortfolioProjects(prev => [...prev, {
+          ...data.portfolioProject,
+          project: addedProject
+        }]);
+      }
+      
       setSuccess('Project added to portfolio!');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add project');
+    } finally {
+      setProcessingProjectId(null);
     }
   };
 
   const handleRemoveProjectFromPortfolio = async (portfolioProjectId: string) => {
     try {
+      setProcessingProjectId(portfolioProjectId);
+      setError('');
+      
       // Get session token from Supabase
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token || '';
@@ -189,11 +208,15 @@ export default function ProfilePage() {
         throw new Error(data.error || 'Failed to remove project');
       }
 
-      await loadData();
+      // Optimistically update UI without full reload
+      setPortfolioProjects(prev => prev.filter(pp => pp.id !== portfolioProjectId));
+      
       setSuccess('Project removed from portfolio!');
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to remove project');
+    } finally {
+      setProcessingProjectId(null);
     }
   };
 
@@ -395,9 +418,10 @@ export default function ProfilePage() {
                     <span className="font-medium">{pp.project.name}</span>
                     <button
                       onClick={() => handleRemoveProjectFromPortfolio(pp.id)}
-                      className="px-3 py-1 text-sm text-red-600 hover:text-red-700"
+                      disabled={processingProjectId === pp.id}
+                      className="px-3 py-1 text-sm text-red-600 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Remove
+                      {processingProjectId === pp.id ? 'Removing...' : 'Remove'}
                     </button>
                   </div>
                 ))}
@@ -416,9 +440,10 @@ export default function ProfilePage() {
                       <span>{project.name}</span>
                       <button
                         onClick={() => handleAddProjectToPortfolio(project.id)}
-                        className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                        disabled={processingProjectId === project.id}
+                        className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        Add
+                        {processingProjectId === project.id ? 'Adding...' : 'Add'}
                       </button>
                     </div>
                   ))}
