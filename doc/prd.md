@@ -500,6 +500,19 @@ Export CSV
 * Fixed rate limit reset logic to properly reset after 24 hours
 * Improved security and integrity of MCP API system
 
+## MCP Page/Article Tools ✅ (Completed: June 17, 2026)
+
+Complete set of MCP tools for AI agents to manage documentation:
+* **list_pages** - List pages with filtering by project, status, or search query
+* **get_page** - Get full page details by ID
+* **add_page** - Create new pages with Markdown content
+* **edit_page** - Update existing page content and metadata
+* **delete_page** - Remove pages by ID
+* **publish_page** - Generate shareable public links
+* **unpublish_page** - Make pages private again
+
+Integrated with DevTrack MCP server at `/api/mcp` with HTTP transport.
+
 ---
 
 # 10. Future Features (Backlog)
@@ -509,7 +522,6 @@ Export CSV
 * **API key rotation & usage history UI** - Complete key management interface with usage analytics
 
 ## Important (P1)
-* **Page/Article MCP tools** - Add `add_page`, `edit_page`, `list_pages` MCP tools for AI agents
 * **Global search** - Search across projects/accounts/stacks/pages using Postgres FTS
 * **Extended export formats** - Add Markdown and JSON export (CSV already exists)
 * **Audit trail** - Track critical changes for projects and MCP key events

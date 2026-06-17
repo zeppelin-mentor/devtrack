@@ -30,7 +30,7 @@ Write high-level opportunities you want to unlock:
 
 | ID | Area | Idea | Problem It Solves | Priority | Effort (S/M/L) | Status | Notes |
 |----|------|------|-------------------|----------|----------------|--------|-------|
-| IMP-001 | MCP | Add page/article MCP tools (`add_page`, `edit_page`, `list_pages`) | Lets AI agents maintain docs while coding | P1 | M | backlog | Depends on Pages module |
+| IMP-001 | MCP | Add page/article MCP tools (`add_page`, `edit_page`, `list_pages`) | Lets AI agents maintain docs while coding | P1 | M | ✅ completed | Shipped with 7 tools: list_pages, get_page, add_page, edit_page, delete_page, publish_page, unpublish_page |
 | IMP-002 | UX | Add global search for projects/accounts/stacks/pages | Faster retrieval in larger datasets | P1 | M | backlog | Use Postgres FTS |
 | IMP-003 | Export | Add Markdown and JSON export formats | Better reuse for portfolios and docs | P1 | S | backlog | CSV already exists |
 | IMP-004 | Reliability | Add audit trail for critical changes | Better debugging and trust | P1 | M | backlog | Start with projects and MCP key events |
@@ -72,6 +72,7 @@ Improve portfolio readiness and day-to-day productivity while strengthening MCP 
 | 2026-06-17 | IMP-011 | Fixed API key revocation to properly delete keys | API keys are now actually removed from database instead of just deactivated |
 | 2026-06-17 | IMP-012 | Fixed rate limit reset logic | Rate limits now properly reset after 24 hours as intended |
 | 2026-06-17 | IMP-013 | Public page access via `/pages/:id` | Public pages accessible via direct URLs with view counter and SEO-friendly layout |
+| 2026-06-17 | IMP-001 | Page/Article MCP Tools | AI agents can now maintain documentation with 7 tools: list_pages, get_page, add_page, edit_page, delete_page, publish_page, unpublish_page |
 
 ---
 
