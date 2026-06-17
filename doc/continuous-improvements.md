@@ -34,12 +34,15 @@ Write high-level opportunities you want to unlock:
 | IMP-002 | UX | Add global search for projects/accounts/stacks/pages | Faster retrieval in larger datasets | P1 | M | backlog | Use Postgres FTS |
 | IMP-003 | Export | Add Markdown and JSON export formats | Better reuse for portfolios and docs | P1 | S | backlog | CSV already exists |
 | IMP-004 | Reliability | Add audit trail for critical changes | Better debugging and trust | P1 | M | backlog | Start with projects and MCP key events |
-| IMP-005 | Portfolio | Public portfolio profile with selected projects | No easy way to showcase work publicly from DevTrack | P0 | M | documented | See `public-portfolio-profile-spec.md` for full spec |
+| IMP-005 | Portfolio | Public portfolio profile with selected projects | No easy way to showcase work publicly from DevTrack | P0 | M | ✅ completed | Shipped June 17, 2026. See `public-portfolio-profile.md` |
 | IMP-006 | Project Quality | Project health status (Red/Amber/Green + blockers) | Hard to quickly identify at-risk projects | P1 | S | backlog | Add dashboard health summary |
 | IMP-007 | Automation | Resume bullet generator from project data | Manual rewriting for resume takes time | P0 | M | backlog | AI-assisted drafts + one-click copy |
-| IMP-008 | Knowledge | Notion-style project pages with templates | Project context is scattered across tools | P0 | L | backlog | Use phased roadmap in `future-work-pages-feature.md` |
+| IMP-008 | Knowledge | Notion-style project pages with templates | Project context is scattered across tools | P0 | L | ✅ completed | Shipped with public sharing. See `public-pages-feature.md` |
 | IMP-009 | Security | API key rotation and usage history UI | Users cannot easily rotate or inspect key usage | P0 | M | backlog | Include revoke-all and last 30-day stats |
 | IMP-010 | Insights | Analytics dashboard (worked/pending trend, stack usage, role mix) | Users cannot measure growth and portfolio gaps | P1 | M | backlog | Monthly and quarterly views |
+| IMP-011 | Security | Fix API key revocation to delete keys | API keys were being deactivated instead of deleted | P0 | S | ✅ completed | Shipped June 17, 2026. Keys now properly deleted |
+| IMP-012 | Security | Fix rate limit reset logic | Rate limits were not resetting after one day | P0 | S | ✅ completed | Shipped June 17, 2026. Reset logic fixed |
+| IMP-013 | Pages | Public page access via direct URL | Public pages needed to be accessible via `/pages/:id` | P1 | S | ✅ completed | Shipped June 17, 2026. Includes view counter |
 
 ---
 
@@ -64,7 +67,11 @@ Improve portfolio readiness and day-to-day productivity while strengthening MCP 
 
 | Date | Item ID | What Was Delivered | Impact |
 |------|---------|--------------------|--------|
-| YYYY-MM-DD | IMP-XXX | Description | Result |
+| 2026-06-17 | IMP-005 | Public Portfolio Profile with visibility controls | Users can now showcase work publicly with customizable project visibility, social links, and analytics |
+| 2026-06-17 | IMP-008 | Notion-style Pages with public sharing | Users can create documentation pages with Markdown, templates, and public sharing via direct URLs |
+| 2026-06-17 | IMP-011 | Fixed API key revocation to properly delete keys | API keys are now actually removed from database instead of just deactivated |
+| 2026-06-17 | IMP-012 | Fixed rate limit reset logic | Rate limits now properly reset after 24 hours as intended |
+| 2026-06-17 | IMP-013 | Public page access via `/pages/:id` | Public pages accessible via direct URLs with view counter and SEO-friendly layout |
 
 ---
 

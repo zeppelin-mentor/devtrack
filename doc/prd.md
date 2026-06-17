@@ -466,9 +466,9 @@ Export CSV
 
 ---
 
-# 9. Implemented Features (Latest)
+# 9. Implemented Features
 
-## Pages & Documentation System ✅
+## Pages & Documentation System ✅ (Completed: June 17, 2026)
 
 * Notion-style page editor with Markdown support
 * Public sharing with automatic URL generation
@@ -480,11 +480,43 @@ Export CSV
 * Shareable links with unique tokens
 * Autosave functionality
 * Change tracking with save status indicators
+* Public page access via direct URLs (`/pages/:id`)
+
+## Public Portfolio Profile ✅ (Completed: June 17, 2026)
+
+* User profile creation with display name, bio, and profile photo
+* Social links (GitHub, LinkedIn, Twitter, website)
+* Email visibility control
+* Portfolio project selection and ordering
+* Per-project visibility controls (8 fields: description, responsibilities, highlights, tech stack, repo, dates, team size, client)
+* Public portfolio view at `/portfolio/[username]`
+* View counter and analytics
+* SEO-optimized with sitemap integration
+* 3-level privacy system: account private → public portfolio → project-level controls
+
+## MCP API Security Improvements ✅ (Completed: June 17, 2026)
+
+* Fixed API key revocation to actually delete keys from database
+* Fixed rate limit reset logic to properly reset after 24 hours
+* Improved security and integrity of MCP API system
 
 ---
 
-# 10. Future Features
+# 10. Future Features (Backlog)
 
+## High Priority (P0)
+* **Resume bullet generator** - AI-assisted resume bullet generation from project data
+* **API key rotation & usage history UI** - Complete key management interface with usage analytics
+
+## Important (P1)
+* **Page/Article MCP tools** - Add `add_page`, `edit_page`, `list_pages` MCP tools for AI agents
+* **Global search** - Search across projects/accounts/stacks/pages using Postgres FTS
+* **Extended export formats** - Add Markdown and JSON export (CSV already exists)
+* **Audit trail** - Track critical changes for projects and MCP key events
+* **Project health status** - Red/Amber/Green status with blockers tracking
+* **Analytics dashboard** - Track trends, stack usage, role mix with time-based views
+
+## Nice to Have (P2)
 * GitHub repo auto import
 * AI resume generator from page content
 * Portfolio website generator from public pages
