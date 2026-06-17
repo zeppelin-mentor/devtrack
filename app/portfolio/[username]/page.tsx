@@ -251,7 +251,8 @@ export default function PublicPortfolioPage() {
                   <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/0 to-orange-500/0 group-hover:from-indigo-500/5 group-hover:to-orange-500/5 transition-all duration-500 rounded-2xl"></div>
                   
                   <div className="relative z-10">
-                    <div className="mb-4">
+                    {/* Title and badges - always shown */}
+                    <div className={project.category || project.role || project.project_type ? "mb-4" : "mb-3"}>
                       <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-indigo-700 transition-colors">
                         {project.name}
                       </h3>
@@ -277,6 +278,7 @@ export default function PublicPortfolioPage() {
                       )}
                     </div>
                     
+                    {/* Description - only if present */}
                     {project.project_description && (
                       <div className="mb-4">
                         <p className="text-gray-700 text-base leading-relaxed">
@@ -285,6 +287,7 @@ export default function PublicPortfolioPage() {
                       </div>
                     )}
                     
+                    {/* Highlights - only if present */}
                     {project.project_highlights && (
                       <div className="mb-4 p-4 bg-gradient-to-r from-yellow-50 to-amber-50 border-l-4 border-yellow-400 rounded-lg shadow-sm">
                         <div className="flex items-start gap-2">
