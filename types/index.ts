@@ -125,6 +125,8 @@ export interface UserProfile {
   // Analytics
   view_count: number;
   last_viewed_at?: string | null;
+  // Admin
+  is_admin: boolean;
   // Metadata
   created_at: string;
   updated_at: string;
@@ -167,4 +169,44 @@ export interface PublicPortfolio {
     repo_url?: string;
     tech_stacks?: string[];
   }>;
+}
+
+export type AnnouncementType = 'info' | 'warning' | 'success' | 'error';
+
+export interface Announcement {
+  id: string;
+  title: string;
+  content: string;
+  type: AnnouncementType;
+  is_active: boolean;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+  expires_at?: string | null;
+  priority: number;
+}
+
+export interface PlatformAnalytics {
+  id: string;
+  date: string;
+  total_users: number | null;
+  new_users: number | null;
+  active_users: number | null;
+  total_projects: number | null;
+  new_projects: number | null;
+  total_pages: number | null;
+  new_pages: number | null;
+  total_portfolio_projects: number | null;
+  new_portfolio_projects: number | null;
+  total_api_requests: number | null;
+  created_at: string | null;
+}
+
+export interface AdminDashboardStats {
+  totalUsers: number;
+  totalProjects: number;
+  totalPages: number;
+  totalPortfolioProjects: number;
+  activeAnnouncements: number;
+  weeklyAnalytics: PlatformAnalytics[];
 }

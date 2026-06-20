@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
+import type { Database } from '@/types/database.types';
 
-let cachedAdminClient: ReturnType<typeof createClient> | null = null;
+let cachedAdminClient: ReturnType<typeof createClient<Database>> | null = null;
 
 export function getSupabaseAdmin() {
   if (cachedAdminClient) {
@@ -14,7 +15,7 @@ export function getSupabaseAdmin() {
     throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY for server APIs.');
   }
 
-  cachedAdminClient = createClient(supabaseUrl, serviceRoleKey, {
+  cachedAdminClient = createClient<Database>(supabaseUrl, serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,

@@ -3,8 +3,10 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, FolderKanban, Mail, Github, Layers, Download, LogOut, User, Plug, BookOpen, FileText } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, Mail, Github, Layers, Download, LogOut, User, Plug, BookOpen, FileText, Shield } from 'lucide-react';
 import { useAuth } from '@/lib/supabase/AuthProvider';
+import { supabase } from '@/lib/supabase/client';
+import { useEffect, useState } from 'react';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -21,6 +23,23 @@ const navigation = [
 export default function Sidebar() {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    checkAdminStatus();
+  }, [user]);
+
+  const checkAdminStatus = async () => {
+    if (!user) return;
+    
+    const { data } = await supabase
+      .from('user_profiles')
+      .select('is_admin')
+      .eq('user_id', user.id)
+      .single();
+
+    setIsAdmin(data?.is_admin === true);
+  };
 
   return (
     <div className="w-64 bg-slate-900 text-white min-h-screen flex flex-col">
@@ -80,6 +99,19 @@ export default function Sidebar() {
       </nav>
 
       <div className="p-4 border-t border-slate-800 space-y-2">
+        {isAdmin && (
+          <Link
+            href="/admin"
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+              pathname === '/admin'
+                ? 'bg-purple-600 text-white shadow-lg'
+                : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+            }`}
+          >
+            <Shield className="w-5 h-5" />
+            <span className="font-medium">Admin</span>
+          </Link>
+        )}
         <Link
           href="/profile"
           className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${

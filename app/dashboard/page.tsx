@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import AnnouncementBanner from '@/components/AnnouncementBanner';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/supabase/AuthProvider';
@@ -105,6 +106,11 @@ export default function DashboardPage() {
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
               <p className="text-slate-600 mt-1">Welcome back! Here&apos;s your project overview.</p>
+            </div>
+
+            {/* Announcements */}
+            <div className="mb-8">
+              <AnnouncementBanner />
             </div>
 
             {/* Statistics Cards */}
